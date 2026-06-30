@@ -334,6 +334,152 @@
   </section>
 
   <!-- ============================================================
+       C — TIME ENCODING VARIANTS (advanced, demoed on Case 3)
+       ============================================================ -->
+  <section class="case-block">
+    <div class="case-head">
+      <h2>C — Time encoding variants <span style="font-size: 12px; color: #6B7280; font-weight: 400;">(advanced, on Case 3)</span></h2>
+      <span class="case-meta">Synthetic Δt per edge · purely illustrative</span>
+    </div>
+    <div class="ctx-box">
+      <div class="ctx-name">Why encode time?</div>
+      <div class="ctx-hypo">Same 9-step Case 3 pattern, now with per-edge wait times. The structural layout (loops, fold-backs) is unchanged — we only add a second channel that shows <em>how long</em> the user spent between steps. Two variants below trade off differently.</div>
+      <div class="ctx-meta">Synthetic times: 1→2 <code>5s</code> · 2→3 <code>3s</code> · 3→4 <code>2s</code> · 4→5 <code>5s</code> · 5→6 <code>15s</code> · 6→7 <code>5s</code> · 7→8 <code>25s</code> · 8→9 <code>60s</code> · total ≈ <code>120s</code></div>
+    </div>
+
+    <!-- =================== C · thickness =================== -->
+    <div class="render-block">
+      <span class="render-label label-c">C · thickness</span><span class="render-sub">stroke-width encodes Δt · swimlane preserved</span>
+      <svg viewBox="0 0 860 290" style="width: 100%; height: 290px;">
+        <rect x="180" y="50" width="130" height="140" fill="#ECFEFF" opacity="0.4"/>
+        <rect x="440" y="50" width="130" height="190" fill="#F5F3FF" opacity="0.4"/>
+        <g font-size="10.5" fill="#374151" font-weight="500">
+          <text x="115" y="22" text-anchor="middle">Greeting</text>
+          <text x="245" y="22" text-anchor="middle" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="375" y="22" text-anchor="middle">Session restart</text>
+          <text x="505" y="22" text-anchor="middle" fill="#6B21A8" font-weight="600">Pending action</text>
+          <text x="635" y="22" text-anchor="middle">Process initiated</text>
+          <text x="765" y="22" text-anchor="middle">Info verify</text>
+        </g>
+        <text x="245" y="38" text-anchor="middle" fill="#0891B2" font-size="9.5" font-weight="600">↻ × 3</text>
+        <text x="505" y="38" text-anchor="middle" fill="#7E22CE" font-size="9.5" font-weight="600">↻ × 2</text>
+        <line x1="40" y1="46" x2="830" y2="46" stroke="#E5E7EB"/>
+        <!-- edges (stroke-width = sqrt-ish scaled Δt) -->
+        <path d="M 127 75 H 233" fill="none" stroke="#9CA3AF" stroke-width="3"/>
+        <path d="M 257 75 H 363" fill="none" stroke="#9CA3AF" stroke-width="2.5"/>
+        <path d="M 375 87 V 100 H 245 V 113" fill="none" stroke="#06B6D4" stroke-width="2"/>
+        <path d="M 257 125 H 493" fill="none" stroke="#9CA3AF" stroke-width="3"/>
+        <path d="M 505 137 V 150 H 245 V 163" fill="none" stroke="#06B6D4" stroke-width="4"/>
+        <path d="M 257 175 H 623" fill="none" stroke="#9CA3AF" stroke-width="3"/>
+        <path d="M 635 187 V 200 H 505 V 213" fill="none" stroke="#A855F7" stroke-width="5"/>
+        <path d="M 517 225 H 753" fill="none" stroke="#9CA3AF" stroke-width="7"/>
+        <!-- inline Δt labels -->
+        <g font-size="9" fill="#6B7280">
+          <text x="180" y="68" text-anchor="middle">5s</text>
+          <text x="310" y="68" text-anchor="middle">3s</text>
+          <text x="320" y="98" text-anchor="middle" fill="#0891B2">2s</text>
+          <text x="375" y="118" text-anchor="middle">5s</text>
+          <text x="370" y="148" text-anchor="middle" fill="#0891B2">15s</text>
+          <text x="440" y="168" text-anchor="middle">5s</text>
+          <text x="565" y="198" text-anchor="middle" fill="#7E22CE">25s</text>
+          <text x="635" y="218" text-anchor="middle">60s</text>
+        </g>
+        <!-- legend -->
+        <g transform="translate(40, 258)" font-size="10" fill="#374151">
+          <text x="0" y="10" font-weight="600" fill="#111827">Δt scale:</text>
+          <line x1="75" y1="7" x2="105" y2="7" stroke="#9CA3AF" stroke-width="2"/><text x="110" y="10">≤ 5s</text>
+          <line x1="145" y1="7" x2="175" y2="7" stroke="#9CA3AF" stroke-width="4"/><text x="180" y="10">~15s</text>
+          <line x1="220" y1="7" x2="250" y2="7" stroke="#9CA3AF" stroke-width="5"/><text x="255" y="10">~25s</text>
+          <line x1="295" y1="7" x2="325" y2="7" stroke="#9CA3AF" stroke-width="7"/><text x="330" y="10">~60s</text>
+        </g>
+        <!-- node circles -->
+        <g><circle cx="115" cy="75" r="12" fill="#9CA3AF"/><text x="115" y="79" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+        <g><circle cx="245" cy="75" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="79" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="375" cy="75" r="12" fill="#9CA3AF"/><text x="375" y="79" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+        <g><circle cx="245" cy="125" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="129" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+        <g><circle cx="505" cy="125" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="505" y="129" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+        <g><circle cx="245" cy="175" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="179" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+        <g><circle cx="635" cy="175" r="12" fill="#9CA3AF"/><text x="635" y="179" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+        <g><circle cx="505" cy="225" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="505" y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
+        <g><circle cx="765" cy="225" r="12" fill="#9CA3AF"/><text x="765" y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+      </svg>
+      <div class="tradeoff">
+        <p class="pro"><strong>Swimlane preserved</strong> — loop structure and step columns are unchanged; time is layered onto the existing C without rearranging anything.</p>
+        <p class="pro"><strong>"Stuck-then-escalates" reads at a glance</strong> — 25s into Pending, then 60s before Info verify shows up as thickening edges.</p>
+        <p class="con"><strong>Quantitative comparison is hard</strong> — stroke width is a weak channel for precise duration; readers can rank but not measure. Numeric labels mitigate but clutter.</p>
+        <p class="con"><strong>Small Δt vanishes</strong> — 2s vs 5s edges look nearly identical; thickness saturates at both ends of the scale.</p>
+      </div>
+    </div>
+
+    <!-- =================== C · distance =================== -->
+    <div class="render-block">
+      <span class="render-label label-c">C · distance</span><span class="render-sub">horizontal position encodes cumulative time · swimlane dropped</span>
+      <svg viewBox="0 0 1400 240" style="width: 100%; height: 240px;">
+        <!-- legend -->
+        <g transform="translate(40, 16)" font-size="10" fill="#374151">
+          <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off step</text>
+          <circle cx="92" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="102" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
+          <circle cx="220" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="230" y="9" fill="#6B21A8" font-weight="600">Pending action (loop)</text>
+          <line x1="370" y1="6" x2="400" y2="6" stroke="#06B6D4" stroke-dasharray="4 3" stroke-width="1.5"/><text x="406" y="9">repeat arc (same step)</text>
+        </g>
+        <!-- time axis -->
+        <line x1="80" y1="120" x2="1320" y2="120" stroke="#D1D5DB" stroke-width="2"/>
+        <!-- tick marks -->
+        <g font-size="9.5" fill="#6B7280">
+          <line x1="80" y1="120" x2="80" y2="128" stroke="#9CA3AF"/><text x="80" y="142" text-anchor="middle">0s</text>
+          <line x1="390" y1="120" x2="390" y2="128" stroke="#9CA3AF"/><text x="390" y="142" text-anchor="middle">30s</text>
+          <line x1="700" y1="120" x2="700" y2="128" stroke="#9CA3AF"/><text x="700" y="142" text-anchor="middle">60s</text>
+          <line x1="1010" y1="120" x2="1010" y2="128" stroke="#9CA3AF"/><text x="1010" y="142" text-anchor="middle">90s</text>
+          <line x1="1320" y1="120" x2="1320" y2="128" stroke="#9CA3AF"/><text x="1320" y="142" text-anchor="middle">120s</text>
+        </g>
+        <!-- light gridlines -->
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="390" y1="60" x2="390" y2="120"/>
+          <line x1="700" y1="60" x2="700" y2="120"/>
+          <line x1="1010" y1="60" x2="1010" y2="120"/>
+        </g>
+        <!-- repeat arcs (below axis) -->
+        <!-- 2→4 Refund req -->
+        <path d="M 132 130 Q 157 175 183 130" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.85"/>
+        <!-- 4→6 Refund req -->
+        <path d="M 183 130 Q 286 200 390 130" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.85"/>
+        <!-- 5→8 Pending action -->
+        <path d="M 235 130 Q 467 215 700 130" fill="none" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.85"/>
+        <!-- arrow tips -->
+        <polygon points="183,130 175,125 175,135" fill="#06B6D4" opacity="0.85"/>
+        <polygon points="390,130 382,125 382,135" fill="#06B6D4" opacity="0.85"/>
+        <polygon points="700,130 692,125 692,135" fill="#A855F7" opacity="0.85"/>
+        <!-- nodes positioned by cumulative time, ~10.33 px/s starting at x=80 -->
+        <g><circle cx="80" cy="120" r="11" fill="#9CA3AF"/><text x="80" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text><text x="80" y="100" text-anchor="middle" fill="#374151" font-size="9.5">Greeting</text></g>
+        <g><circle cx="132" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="132" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="132" y="100" text-anchor="middle" fill="#0E7490" font-size="9.5" font-weight="600">Refund req</text></g>
+        <g><circle cx="163" cy="120" r="11" fill="#9CA3AF"/><text x="163" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="163" y="80" text-anchor="middle" fill="#374151" font-size="9.5">Restart</text></g>
+        <g><circle cx="183" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="183" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="183" y="100" text-anchor="middle" fill="#0E7490" font-size="9.5" font-weight="600">Refund req</text></g>
+        <g><circle cx="235" cy="120" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="235" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text><text x="235" y="80" text-anchor="middle" fill="#6B21A8" font-size="9.5" font-weight="600">Pending</text></g>
+        <g><circle cx="390" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="390" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text><text x="390" y="100" text-anchor="middle" fill="#0E7490" font-size="9.5" font-weight="600">Refund req</text></g>
+        <g><circle cx="442" cy="120" r="11" fill="#9CA3AF"/><text x="442" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text><text x="442" y="100" text-anchor="middle" fill="#374151" font-size="9.5">Process init</text></g>
+        <g><circle cx="700" cy="120" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="700" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text><text x="700" y="100" text-anchor="middle" fill="#6B21A8" font-size="9.5" font-weight="600">Pending</text></g>
+        <g><circle cx="1320" cy="120" r="11" fill="#9CA3AF"/><text x="1320" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text><text x="1320" y="100" text-anchor="middle" fill="#374151" font-size="9.5">Info verify</text></g>
+        <!-- Δt callouts on long gaps -->
+        <g font-size="9" fill="#6B7280" font-style="italic">
+          <text x="313" y="78" text-anchor="middle">15s wait</text>
+          <text x="571" y="78" text-anchor="middle">25s wait</text>
+          <text x="1010" y="78" text-anchor="middle">60s wait</text>
+        </g>
+      </svg>
+      <div class="tradeoff">
+        <p class="pro"><strong>Quantitative + ordinal</strong> — distance maps directly to seconds; readers can measure, not just rank. Long waits become visually long gaps.</p>
+        <p class="pro"><strong>Friction shape is obvious</strong> — three big gaps after step 5 jump out as the dominant pattern; the early refund loop compresses into a tight cluster.</p>
+        <p class="con"><strong>Swimlane lost</strong> — repeated steps no longer share a column; loops must be re-read off the repeat arcs and color coding.</p>
+        <p class="con"><strong>Width depends on data</strong> — a single 10-minute gap can stretch the whole viz horizontally; needs log-scale or clipping when Δt is heavy-tailed.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 14px; padding: 10px 14px; background: #F5F3FF; border-left: 3px solid #A855F7; border-radius: 0 6px 6px 0; font-size: 12px; color: #5B21B6; line-height: 1.55;">
+      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Distance</em> when the question is "where does the user actually spend time?" — abandoning swimlanes is worth it to get a true time axis. They are not mutually exclusive: a UI could let the user toggle between the two views on the same pattern.
+    </div>
+  </section>
+
+  <!-- ============================================================
        BOTTOM: summary + decision matrix
        ============================================================ -->
   <div style="padding: 12px 16px; background: #FEF3C7; border-left: 3px solid #D97706; border-radius: 6px; font-size: 12px; color: #92400E; margin-bottom: 12px;">
