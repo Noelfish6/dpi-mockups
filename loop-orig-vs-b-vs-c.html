@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern loop viz · Original vs B vs C</title>
+<style>
+  body { margin: 0; background: #F3F4F6; }
+  .ctx-box { background: #F9FAFB; border-left: 3px solid #6366F1; padding: 10px 14px; margin: 0 0 18px; border-radius: 0 6px 6px 0; font-size: 12px; line-height: 1.55; }
+  .ctx-box .ctx-name { font-weight: 600; color: #111827; }
+  .ctx-box .ctx-hypo { color: #4B5563; margin-top: 3px; }
+  .ctx-box .ctx-meta { color: #6B7280; font-size: 11px; margin-top: 4px; }
+  .ctx-box .ctx-meta code { background: #E5E7EB; padding: 1px 5px; border-radius: 3px; font-size: 10.5px; }
+  .missing-call { padding: 10px 14px; background: #FEF2F2; border-left: 3px solid #DC2626; border-radius: 0 6px 6px 0; font-size: 12px; color: #991B1B; margin-top: 10px; line-height: 1.55; }
+  .case-block { background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .case-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #F3F4F6; }
+  .case-head h2 { font-size: 16px; font-weight: 600; margin: 0; }
+  .case-head .case-meta { font-size: 11px; color: #6B7280; }
+  .render-block { margin-top: 18px; padding-top: 14px; border-top: 1px dashed #E5E7EB; }
+  .render-block:first-of-type { border-top: 0; padding-top: 4px; }
+  .render-label { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; color: #fff; padding: 3px 10px; border-radius: 4px; margin-bottom: 8px; }
+  .render-label.label-o { background: #6B7280; }
+  .render-label.label-b { background: #06B6D4; }
+  .render-label.label-c { background: #A855F7; }
+  .render-block .render-sub { font-size: 11px; color: #6B7280; margin-left: 8px; }
+  .tradeoff { font-size: 12px; color: #4B5563; margin-top: 14px; line-height: 1.55; }
+  .tradeoff strong { color: #111827; }
+  .pro::before { content: '✓ '; color: #059669; font-weight: 600; }
+  .con::before { content: '✗ '; color: #DC2626; font-weight: 600; }
+</style>
+
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111827; padding: 24px; max-width: 1180px; margin: 0 auto;">
+
+  <div style="margin-bottom: 20px;">
+    <h1 style="font-size: 20px; font-weight: 600; margin: 0 0 6px;">Original vs B vs C — Three-way comparison</h1>
+    <p style="font-size: 13px; color: #6B7280; margin: 0;">For each Pattern, three renderings are shown in order: <strong>Original</strong> (current production <code style="font-size: 11px; background: #F3F4F6; padding: 1px 5px; border-radius: 3px;">PatternStepViz</code>), <strong>B</strong> (Arc-back loops), <strong>C</strong> (Orthogonal Swimlanes).</p>
+  </div>
+
+  <!-- ============================================================
+       CASE 1 · C4 — Agent Request redirected to self-service
+       ============================================================ -->
+  <section class="case-block">
+    <div class="case-head">
+      <h2>Case 1 · C4 · 3 steps</h2>
+      <span class="case-meta">No loop · No filter_by</span>
+    </div>
+    <div class="ctx-box">
+      <div class="ctx-name">AskBo (Redirected): Agent Request</div>
+      <div class="ctx-hypo">Among users who opened an AskBo chat and explicitly requested a human agent between June 10 and June 16, 2026, approximately 1 in 3 (31.7%, 3,444 of 10,872 devices) were redirected to self-service rather than connected to a live agent. What made this pattern structurally distinctive was that the routing decision did not appear to be driven by the agent connection request itself — 91.5% of redirected users sent an agent connection message with no topic tag, a rate nearly identical to the 82.3% seen in the escalated comparison group. Instead, the prior conversation topic before the agent request was the strongest observable differentiator: sessions preceded by an Information Request / Information Verification exchange showed a 39.7% redirect rate, while sessions preceded by a Booking management / Refund exchange showed a 4.4% redirect rate. After the agent request was sent, the bot generated an average of 2.44 additional self-service prompts before executing the redirect, with 89.3% of redirected sessions receiving a 'Deflect &amp; Offer Help' response at the redirect event — a consistent pattern stable across both analysis windows.</div>
+      <div class="ctx-meta">outcome: <code>Redirect to Self-Service</code> · pattern_id: <code>C4_agentconn_redirect</code></div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-o">Original</span><span class="render-sub">current production</span>
+      <svg viewBox="0 0 900 140" style="width: 100%; height: 140px;">
+        <line x1="120" y1="54" x2="780" y2="54" stroke="#e2e3e3" stroke-width="1"/>
+        <g><circle cx="180" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="180" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="180" y="104" text-anchor="middle" fill="#424548" font-size="13">Initial greeting</text></g>
+        <g><circle cx="450" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="450" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="450" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="450" dy="0">User requests</tspan><tspan x="450" dy="16">agent</tspan></text></g>
+        <g><circle cx="720" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="720" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="720" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="720" dy="0">Bot redirects</tspan><tspan x="720" dy="16">to self-svc</tspan></text></g>
+      </svg>
+      <div class="missing-call">
+        Simple case — the original is sufficient. B/C's advantages mainly show up with multi-step repetition.
+      </div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-b">B</span><span class="render-sub">Arc-back loops</span>
+      <svg viewBox="0 0 900 120" style="width: 100%; height: 120px;">
+        <line x1="80" y1="60" x2="780" y2="60" stroke="#D1D5DB" stroke-width="2"/>
+        <g><circle cx="150" cy="60" r="14" fill="#9CA3AF"/><text x="150" y="64" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">1</text><text x="150" y="92" text-anchor="middle" fill="#374151" font-size="11">Initial greeting</text></g>
+        <g><circle cx="380" cy="60" r="14" fill="#9CA3AF"/><text x="380" y="64" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2</text><text x="380" y="92" text-anchor="middle" fill="#374151" font-size="11">User requests agent</text></g>
+        <g><circle cx="610" cy="60" r="14" fill="#9CA3AF"/><text x="610" y="64" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">3</text><text x="610" y="92" text-anchor="middle" fill="#374151" font-size="11">Bot redirects to self-svc</text></g>
+      </svg>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-c">C</span><span class="render-sub">Orthogonal Swimlanes</span>
+      <svg viewBox="0 0 640 210" style="width: 100%; height: 210px;">
+        <defs>
+          <marker id="arr-grey-c1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+        <g font-size="10.5" fill="#374151" font-weight="500">
+          <text x="150" y="22" text-anchor="middle">Initial greeting</text>
+          <text x="350" y="22" text-anchor="middle">User requests agent</text>
+          <text x="550" y="22" text-anchor="middle">Bot redirects to self-svc</text>
+        </g>
+        <line x1="40" y1="46" x2="610" y2="46" stroke="#E5E7EB"/>
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="250" y1="50" x2="250" y2="164"/>
+          <line x1="450" y1="50" x2="450" y2="164"/>
+        </g>
+        <g font-size="9" fill="#9CA3AF">
+          <text x="20" y="65" text-anchor="start">Time</text>
+          <path d="M 28 70 V 148" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M 25 144 L 28 152 L 31 144 Z" fill="#9CA3AF"/>
+        </g>
+        <path d="M 150 81 V 107 H 338" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 350 119 V 145 H 538" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 550 157 V 190" fill="none" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-grey-c1)"/>
+        <g><circle cx="150" cy="69" r="12" fill="#9CA3AF"/><text x="150" y="73" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+        <g><circle cx="350" cy="107" r="12" fill="#9CA3AF"/><text x="350" y="111" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="550" cy="145" r="12" fill="#9CA3AF"/><text x="550" y="149" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CASE 2 · E2 — Refund retry → bot action × 2
+       ============================================================ -->
+  <section class="case-block">
+    <div class="case-head">
+      <h2>Case 2 · E2 · 7 steps · Bot action × 2</h2>
+      <span class="case-meta">Single loop · No filter_by</span>
+    </div>
+    <div class="ctx-box">
+      <div class="ctx-name">AskBo (Agent Connection): Refund Retried, Process Started</div>
+      <div class="ctx-hypo">Users who retried a Refund request and progressed through the bot's process initiation step before reaching an Information Verification exchange represent a segment that had already committed to a multi-step resolution attempt. Despite completing this extended bot engagement, the majority requested a human agent within seconds of the Information Verification message — suggesting the bot flow at this stage does not provide sufficient resolution guidance for this cohort. The pattern separates into three structurally distinct trajectories based on post-verification engagement depth: a rapid exit to agent request, an extended information exchange that reaches full resolution, and a prolonged high-frustration loop that ends in system escalation.</div>
+      <div class="ctx-meta">outcome: <code>Agent Connection</code> · pattern_id: <code>E2_refund_pi_pca_agentconn</code></div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-o">Original</span><span class="render-sub">current production</span>
+      <svg viewBox="0 0 1100 140" style="width: 100%; height: 140px;">
+        <line x1="100" y1="54" x2="1000" y2="54" stroke="#e2e3e3" stroke-width="1"/>
+        <g><circle cx="130" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="130" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="130" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="130" dy="0">Initial</tspan><tspan x="130" dy="16">greeting</tspan></text></g>
+        <g><circle cx="275" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="275" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="275" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="275" dy="0">Refund</tspan><tspan x="275" dy="16">request</tspan></text></g>
+        <g><circle cx="420" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="420" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="420" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="420" dy="0">Bot action</tspan><tspan x="420" dy="16">request</tspan></text></g>
+        <g><circle cx="565" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="565" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="565" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="565" dy="0">Refund</tspan><tspan x="565" dy="16">retry</tspan></text></g>
+        <g><circle cx="710" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="710" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="710" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="710" dy="0">Process</tspan><tspan x="710" dy="16">initiated</tspan></text></g>
+        <g><circle cx="855" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="855" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="855" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="855" dy="0">Bot action</tspan><tspan x="855" dy="16">request</tspan></text></g>
+        <g><circle cx="1000" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="1000" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="1000" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="1000" dy="0">Info verify</tspan><tspan x="1000" dy="16">request</tspan></text></g>
+      </svg>
+      <div class="missing-call">
+        "Bot action request" appears twice (step 3 + step 6), but the original draws them as two identical grey nodes — readers have to visually diff the labels to realize it's the same event.
+      </div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-b">B</span><span class="render-sub">Arc-back loops</span>
+      <svg viewBox="0 0 1100 160" style="width: 100%; height: 160px;">
+        <path d="M 680 75 Q 470 5 260 75" fill="none" stroke="#06B6D4" stroke-width="2" stroke-dasharray="5 4" opacity="0.8"/>
+        <polygon points="260,75 268,70 268,80" fill="#06B6D4" opacity="0.8"/>
+        <line x1="60" y1="85" x2="1010" y2="85" stroke="#D1D5DB" stroke-width="2"/>
+        <g><circle cx="120" cy="85" r="13" fill="#9CA3AF"/><text x="120" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text><text x="120" y="115" text-anchor="middle" fill="#374151" font-size="10">Greeting</text></g>
+        <g><circle cx="260" cy="85" r="13" fill="#9CA3AF"/><text x="260" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="260" y="115" text-anchor="middle" fill="#374151" font-size="10">Refund req</text></g>
+        <g><circle cx="400" cy="85" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="400" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="400" y="115" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Bot action req</text></g>
+        <g><circle cx="540" cy="85" r="13" fill="#9CA3AF"/><text x="540" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="540" y="115" text-anchor="middle" fill="#374151" font-size="10">Refund retry</text></g>
+        <g><circle cx="680" cy="85" r="13" fill="#9CA3AF"/><text x="680" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text><text x="680" y="115" text-anchor="middle" fill="#374151" font-size="10">Process init</text></g>
+        <g><circle cx="820" cy="85" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="820" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text><text x="820" y="115" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Bot action req</text></g>
+        <g><circle cx="960" cy="85" r="13" fill="#9CA3AF"/><text x="960" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text><text x="960" y="115" text-anchor="middle" fill="#374151" font-size="10">Info verify req</text></g>
+        <g transform="translate(420, 18)"><rect x="0" y="0" width="135" height="22" rx="11" fill="#ECFEFF" stroke="#06B6D4" stroke-width="1"/><text x="68" y="15" text-anchor="middle" fill="#0E7490" font-size="11" font-weight="600">↻ Bot action × 2</text></g>
+      </svg>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-c">C</span><span class="render-sub">Orthogonal Swimlanes</span>
+      <svg viewBox="0 0 860 360" style="width: 100%; height: 360px;">
+        <defs>
+          <marker id="arr-grey-c2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+        <rect x="310" y="50" width="130" height="266" fill="#ECFEFF" opacity="0.4"/>
+        <g font-size="10.5" fill="#374151" font-weight="500">
+          <text x="115" y="22" text-anchor="middle">Initial greeting</text>
+          <text x="245" y="22" text-anchor="middle">Refund request</text>
+          <text x="375" y="22" text-anchor="middle" fill="#0E7490" font-weight="600">Bot action request</text>
+          <text x="505" y="22" text-anchor="middle">Refund retry</text>
+          <text x="635" y="22" text-anchor="middle">Process initiated</text>
+          <text x="765" y="22" text-anchor="middle">Info verify request</text>
+        </g>
+        <text x="375" y="38" text-anchor="middle" fill="#0891B2" font-size="9.5" font-weight="600">↻ × 2</text>
+        <line x1="40" y1="46" x2="830" y2="46" stroke="#E5E7EB"/>
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="180" y1="50" x2="180" y2="316"/>
+          <line x1="310" y1="50" x2="310" y2="316"/>
+          <line x1="440" y1="50" x2="440" y2="316"/>
+          <line x1="570" y1="50" x2="570" y2="316"/>
+          <line x1="700" y1="50" x2="700" y2="316"/>
+        </g>
+        <g font-size="9" fill="#9CA3AF">
+          <text x="20" y="65" text-anchor="start">Time</text>
+          <path d="M 28 70 V 300" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M 25 296 L 28 304 L 31 296 Z" fill="#9CA3AF"/>
+        </g>
+        <path d="M 115 81 V 107 H 233" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 245 119 V 145 H 363" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 375 157 V 183 H 493" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 505 195 V 221 H 623" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 635 233 V 259 H 387" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <path d="M 375 271 V 297 H 753" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 765 309 V 342" fill="none" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-grey-c2)"/>
+        <g><circle cx="115" cy="69" r="12" fill="#9CA3AF"/><text x="115" y="73" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+        <g><circle cx="245" cy="107" r="12" fill="#9CA3AF"/><text x="245" y="111" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="375" cy="145" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="375" y="149" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+        <g><circle cx="505" cy="183" r="12" fill="#9CA3AF"/><text x="505" y="187" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+        <g><circle cx="635" cy="221" r="12" fill="#9CA3AF"/><text x="635" y="225" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+        <g><circle cx="375" cy="259" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="375" y="263" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+        <g><circle cx="765" cy="297" r="12" fill="#9CA3AF"/><text x="765" y="301" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CASE 3 · E3 — Refund restart, multi-loop
+       ============================================================ -->
+  <section class="case-block">
+    <div class="case-head">
+      <h2>Case 3 · E3 · 9 steps · Refund × 3 + Pending × 2</h2>
+      <span class="case-meta">Multi-loop · No filter_by</span>
+    </div>
+    <div class="ctx-box">
+      <div class="ctx-name">AskBo (Agent Connection): Refund Restarted, Process Started</div>
+      <div class="ctx-hypo">Users who initiated a refund request, received an unexpected conversation reset mid-session, and persisted through a full second refund attempt before reaching process initiation represent a pattern of compounded friction within a single bot interaction. Unlike users who encountered refund delays without a session restart, this cohort faced a doubled accumulation of waiting steps across the restarted conversation, correlating with a meaningfully higher rate of human agent escalation than comparable refund journeys without a restart event. The defining structural feature of this pattern is the bot's sequencing at the process initiation stage — where confirmation of refund start is followed near-instantaneously by a waiting-state message, leaving users with unresolved expectations that the subsequent verification step does not appear to address.</div>
+      <div class="ctx-meta">outcome: <code>Agent Connection</code> · pattern_id: <code>E3_refund_regreet_pi_agentconn</code></div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-o">Original</span><span class="render-sub">current production</span>
+      <svg viewBox="0 0 1100 140" style="width: 100%; height: 140px;">
+        <line x1="80" y1="54" x2="1020" y2="54" stroke="#e2e3e3" stroke-width="1"/>
+        <g><circle cx="105" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="105" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="105" y="104" text-anchor="middle" fill="#424548" font-size="13">Greeting</text></g>
+        <g><circle cx="220" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="220" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="220" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="220" dy="0">Refund</tspan><tspan x="220" dy="16">request</tspan></text></g>
+        <g><circle cx="335" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="335" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="335" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="335" dy="0">Session</tspan><tspan x="335" dy="16">restart</tspan></text></g>
+        <g><circle cx="450" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="450" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="450" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="450" dy="0">Refund</tspan><tspan x="450" dy="16">request</tspan></text></g>
+        <g><circle cx="565" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="565" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="565" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="565" dy="0">Pending</tspan><tspan x="565" dy="16">action</tspan></text></g>
+        <g><circle cx="680" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="680" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="680" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="680" dy="0">Refund</tspan><tspan x="680" dy="16">request</tspan></text></g>
+        <g><circle cx="795" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="795" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="795" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="795" dy="0">Process</tspan><tspan x="795" dy="16">initiated</tspan></text></g>
+        <g><circle cx="910" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="910" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="910" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="910" dy="0">Pending</tspan><tspan x="910" dy="16">action</tspan></text></g>
+        <g><circle cx="1025" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="1025" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="1025" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="1025" dy="0">Info</tspan><tspan x="1025" dy="16">verify</tspan></text></g>
+      </svg>
+      <div class="missing-call">
+        <strong>Loops are completely invisible</strong> — "Refund request" × 3 + "Pending action" × 2 are all drawn as separate grey nodes. The core narrative — "user trapped in a refund loop → eventually escalates to a human agent" — is lost visually.
+      </div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-b">B</span><span class="render-sub">Arc-back loops</span>
+      <svg viewBox="0 0 1100 220" style="width: 100%; height: 220px;">
+        <path d="M 685 110 Q 432 5 180 110" fill="none" stroke="#06B6D4" stroke-width="2" stroke-dasharray="5 4" opacity="0.7"/>
+        <polygon points="180,110 188,105 188,115" fill="#06B6D4" opacity="0.7"/>
+        <path d="M 432 110 Q 306 60 180 110" fill="none" stroke="#06B6D4" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.4"/>
+        <path d="M 559 130 Q 685 215 811 130" fill="none" stroke="#A855F7" stroke-width="2" stroke-dasharray="5 4" opacity="0.7"/>
+        <polygon points="811,130 803,125 803,135" fill="#A855F7" opacity="0.7"/>
+        <line x1="60" y1="120" x2="1000" y2="120" stroke="#D1D5DB" stroke-width="2"/>
+        <g><circle cx="105" cy="120" r="13" fill="#9CA3AF"/><text x="105" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text><text x="105" y="152" text-anchor="middle" fill="#374151" font-size="10">Greeting</text></g>
+        <g><circle cx="180" cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="180" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="180" y="152" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req</text></g>
+        <g><circle cx="306" cy="120" r="13" fill="#9CA3AF"/><text x="306" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="306" y="152" text-anchor="middle" fill="#374151" font-size="10">Restart</text></g>
+        <g><circle cx="432" cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="432" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="432" y="152" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req</text></g>
+        <g><circle cx="559" cy="120" r="13" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="559" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text><text x="559" y="152" text-anchor="middle" fill="#6B21A8" font-size="10" font-weight="500">Pending</text></g>
+        <g><circle cx="685" cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="685" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text><text x="685" y="152" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req</text></g>
+        <g><circle cx="748" cy="120" r="13" fill="#9CA3AF"/><text x="748" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text><text x="748" y="152" text-anchor="middle" fill="#374151" font-size="10">Process init</text></g>
+        <g><circle cx="811" cy="120" r="13" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="811" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text><text x="811" y="152" text-anchor="middle" fill="#6B21A8" font-size="10" font-weight="500">Pending</text></g>
+        <g><circle cx="874" cy="120" r="13" fill="#9CA3AF"/><text x="874" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text><text x="874" y="152" text-anchor="middle" fill="#374151" font-size="10">Info verify</text></g>
+        <g transform="translate(60, 185)"><rect x="0" y="0" width="110" height="20" rx="10" fill="#ECFEFF" stroke="#06B6D4" stroke-width="1"/><text x="55" y="14" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="600">↻ Refund × 3</text></g>
+        <g transform="translate(180, 185)"><rect x="0" y="0" width="125" height="20" rx="10" fill="#F5F3FF" stroke="#A855F7" stroke-width="1"/><text x="62" y="14" text-anchor="middle" fill="#6B21A8" font-size="10" font-weight="600">↻ Pending × 2</text></g>
+      </svg>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-c">C</span><span class="render-sub">Orthogonal Swimlanes</span>
+      <svg viewBox="0 0 860 440" style="width: 100%; height: 440px;">
+        <defs>
+          <marker id="arr-grey-c3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+        <rect x="180" y="50" width="130" height="342" fill="#ECFEFF" opacity="0.4"/>
+        <rect x="440" y="50" width="130" height="342" fill="#F5F3FF" opacity="0.4"/>
+        <g font-size="10.5" fill="#374151" font-weight="500">
+          <text x="115" y="22" text-anchor="middle">Greeting</text>
+          <text x="245" y="22" text-anchor="middle" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="375" y="22" text-anchor="middle">Session restart</text>
+          <text x="505" y="22" text-anchor="middle" fill="#6B21A8" font-weight="600">Pending action</text>
+          <text x="635" y="22" text-anchor="middle">Process initiated</text>
+          <text x="765" y="22" text-anchor="middle">Info verify</text>
+        </g>
+        <text x="245" y="38" text-anchor="middle" fill="#0891B2" font-size="9.5" font-weight="600">↻ × 3</text>
+        <text x="505" y="38" text-anchor="middle" fill="#7E22CE" font-size="9.5" font-weight="600">↻ × 2</text>
+        <line x1="40" y1="46" x2="830" y2="46" stroke="#E5E7EB"/>
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="180" y1="50" x2="180" y2="392"/>
+          <line x1="310" y1="50" x2="310" y2="392"/>
+          <line x1="440" y1="50" x2="440" y2="392"/>
+          <line x1="570" y1="50" x2="570" y2="392"/>
+          <line x1="700" y1="50" x2="700" y2="392"/>
+        </g>
+        <g font-size="9" fill="#9CA3AF">
+          <text x="20" y="65" text-anchor="start">Time</text>
+          <path d="M 28 70 V 376" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M 25 372 L 28 380 L 31 372 Z" fill="#9CA3AF"/>
+        </g>
+        <path d="M 115 81 V 107 H 233" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 245 119 V 145 H 363" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 375 157 V 183 H 257" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <path d="M 245 195 V 221 H 493" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 505 233 V 259 H 257" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <path d="M 245 271 V 297 H 623" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 635 309 V 335 H 517" fill="none" stroke="#A855F7" stroke-width="1.8"/>
+        <path d="M 505 347 V 373 H 753" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 765 385 V 420" fill="none" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-grey-c3)"/>
+        <g><circle cx="115" cy="69" r="12" fill="#9CA3AF"/><text x="115" y="73" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+        <g><circle cx="245" cy="107" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="111" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="375" cy="145" r="12" fill="#9CA3AF"/><text x="375" y="149" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+        <g><circle cx="245" cy="183" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="187" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+        <g><circle cx="505" cy="221" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="505" y="225" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+        <g><circle cx="245" cy="259" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="245" y="263" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+        <g><circle cx="635" cy="297" r="12" fill="#9CA3AF"/><text x="635" y="301" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+        <g><circle cx="505" cy="335" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="505" y="339" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
+        <g><circle cx="765" cy="373" r="12" fill="#9CA3AF"/><text x="765" y="377" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CASE 4 · fcr_premature — filter_by case
+       ============================================================ -->
+  <section class="case-block">
+    <div class="case-head">
+      <h2>Case 4 · fcr_premature · 4 steps · with filter_by</h2>
+      <span class="case-meta">No loop · filter_by constraint</span>
+    </div>
+    <div class="ctx-box">
+      <div class="ctx-name">AskBo (&lt; 5 min re-contact): Incorrect Resolution Marking</div>
+      <div class="ctx-hypo">Users in this segment opened an AskBo chat, submitted a request that the bot marked as Fully Resolved within five minutes, and then immediately restarted a new session — returning with the same intent before any meaningful resolution could have occurred. Unlike patterns where drop-off follows a multi-turn exchange or an explicit user signal of dissatisfaction, non-conversion here appeared primarily in sessions where the bot's resolution signal was premature.</div>
+      <div class="ctx-meta">outcome: <code>Fully Resolved (premature)</code> · pattern_id: <code>fcr_premature_resolution_auto_reset</code></div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-o">Original</span><span class="render-sub">current production</span>
+      <svg viewBox="0 0 1100 140" style="width: 100%; height: 140px;">
+        <line x1="120" y1="54" x2="980" y2="54" stroke="#e2e3e3" stroke-width="1"/>
+        <g><circle cx="180" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="180" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="180" y="104" text-anchor="middle" fill="#424548" font-size="13">User intent</text></g>
+        <g><circle cx="450" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="450" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="450" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="450" dy="0">Fully</tspan><tspan x="450" dy="16">Resolved</tspan></text></g>
+        <g><circle cx="720" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="720" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="720" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="720" dy="0">New</tspan><tspan x="720" dy="16">session</tspan></text></g>
+        <g><circle cx="970" cy="54" r="26" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/><circle cx="970" cy="54" r="6" fill="none" stroke="#444441" stroke-width="1.75"/><text x="970" y="104" text-anchor="middle" fill="#424548" font-size="13"><tspan x="970" dy="0">Same intent</tspan><tspan x="970" dy="16">re-contact</tspan></text></g>
+      </svg>
+      <div class="missing-call">
+        <strong>The filter_by constraint is completely invisible</strong> — the pattern definition's core structural feature is "Fully Resolved → New session must occur within 5 min", yet the original draws all 4 steps as independent grey nodes, dropping the constraint entirely.
+      </div>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-b">B</span><span class="render-sub">Arc-back loops · filter_by overlay</span>
+      <svg viewBox="0 0 1100 200" style="width: 100%; height: 200px;">
+        <line x1="60" y1="85" x2="1010" y2="85" stroke="#D1D5DB" stroke-width="2"/>
+        <g><circle cx="140" cy="85" r="13" fill="#9CA3AF"/><text x="140" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text><text x="140" y="115" text-anchor="middle" fill="#374151" font-size="10">User intent</text></g>
+        <g><circle cx="380" cy="85" r="13" fill="#9CA3AF"/><text x="380" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="380" y="115" text-anchor="middle" fill="#374151" font-size="10">Fully Resolved</text></g>
+        <g><circle cx="620" cy="85" r="13" fill="#9CA3AF"/><text x="620" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="620" y="115" text-anchor="middle" fill="#374151" font-size="10">New session</text></g>
+        <g><circle cx="860" cy="85" r="13" fill="#9CA3AF"/><text x="860" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="860" y="115" text-anchor="middle" fill="#374151" font-size="10">Same intent re-contact</text></g>
+        <g>
+          <path d="M 380 142 V 148 H 620 V 142" fill="none" stroke="#0EA5E9" stroke-width="1.5"/>
+          <rect x="445" y="152" width="110" height="18" rx="9" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="1"/>
+          <text x="500" y="164" text-anchor="middle" fill="#075985" font-size="10" font-weight="600">⏱ Δt &lt; 5 min</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="render-block">
+      <span class="render-label label-c">C</span><span class="render-sub">Orthogonal Swimlanes · filter_by integrated above step labels</span>
+      <svg viewBox="0 0 800 250" style="width: 100%; height: 250px;">
+        <defs>
+          <marker id="arr-grey-c4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9CA3AF"/>
+          </marker>
+        </defs>
+        <g>
+          <path d="M 370 30 V 22 H 530 V 30" fill="none" stroke="#0EA5E9" stroke-width="1.2"/>
+          <rect x="395" y="6" width="110" height="16" rx="8" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="1"/>
+          <text x="450" y="17" text-anchor="middle" fill="#075985" font-size="9.5" font-weight="600">⏱ Δt &lt; 5 min</text>
+        </g>
+        <g font-size="10.5" fill="#374151" font-weight="500">
+          <text x="210" y="44" text-anchor="middle">User intent</text>
+          <text x="370" y="44" text-anchor="middle">Fully Resolved</text>
+          <text x="530" y="44" text-anchor="middle">New session</text>
+          <text x="690" y="44" text-anchor="middle">Same intent re-contact</text>
+        </g>
+        <line x1="100" y1="54" x2="770" y2="54" stroke="#E5E7EB"/>
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="290" y1="58" x2="290" y2="210"/>
+          <line x1="450" y1="58" x2="450" y2="210"/>
+          <line x1="610" y1="58" x2="610" y2="210"/>
+        </g>
+        <g font-size="9" fill="#9CA3AF">
+          <text x="60" y="73" text-anchor="start">Time</text>
+          <path d="M 68 78 V 196" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="2 2"/>
+          <path d="M 65 192 L 68 200 L 71 192 Z" fill="#9CA3AF"/>
+        </g>
+        <path d="M 210 89 V 115 H 358" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 370 127 V 153 H 518" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 530 165 V 191 H 678" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 690 203 V 238" fill="none" stroke="#9CA3AF" stroke-width="1.5" marker-end="url(#arr-grey-c4)"/>
+        <g><circle cx="210" cy="77" r="12" fill="#9CA3AF"/><text x="210" y="81" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+        <g><circle cx="370" cy="115" r="12" fill="#9CA3AF"/><text x="370" y="119" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="530" cy="153" r="12" fill="#9CA3AF"/><text x="530" y="157" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+        <g><circle cx="690" cy="191" r="12" fill="#9CA3AF"/><text x="690" y="195" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BOTTOM: summary + decision matrix
+       ============================================================ -->
+  <div style="padding: 12px 16px; background: #FEF3C7; border-left: 3px solid #D97706; border-radius: 6px; font-size: 12px; color: #92400E; margin-bottom: 12px;">
+    <strong>The real problem with the original:</strong> The current <code>PatternStepViz</code> actually <em>supports</em> repetition role and milestone (pill + amber + green three-color rules) — but the Pattern detail page's adapter chain <code>segment_steps[] → stepsToFlowData → flowDataToSequence</code> marks every node as <code>phase='shared'</code> and skips <code>repeatCount</code>, so repetition structure and outcome are never passed to the viz.<br>
+    → No need to reinvent the viz; both B and C can be implemented as a "loop-aware adapter" on top of the <strong>same PatternStepViz component</strong>.
+  </div>
+
+  <div style="padding: 12px 16px; background: #ECFEFF; border-left: 3px solid #06B6D4; border-radius: 6px; font-size: 12px; color: #155E75; margin-bottom: 12px;">
+    <strong>B summary:</strong> Linear timeline, visible loop arcs, intuitive "stuck" semantics for dialog-style patterns. With complex cases, arcs need to be layered and color-coded to stay readable. filter_by is shown with a node badge plus a bottom time-difference bracket overlay, without breaking the main flow.
+  </div>
+
+  <div style="padding: 12px 16px; background: #F5F3FF; border-left: 3px solid #A855F7; border-radius: 6px; font-size: 12px; color: #5B21B6; margin-bottom: 20px;">
+    <strong>C summary:</strong> Orthogonal connectors (straight lines + 90° turns) make the swimlane read like a flowchart. Returning to the same lane = a loop, unambiguously; extending to N groups needs no new rules. The cost is height that grows with the number of unique labels. filter_by uses a top pill plus a hanging bracket anchored to the adjacent step columns.
+  </div>
+
+  <div style="background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 18px;">
+    <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 12px;">Three-way decision matrix</h3>
+    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #F9FAFB; text-align: left;">
+          <th style="padding: 8px 10px; border-bottom: 1px solid #E5E7EB; font-weight: 600;">Dimension</th>
+          <th style="padding: 8px 10px; border-bottom: 1px solid #E5E7EB; font-weight: 600;">Original (production)</th>
+          <th style="padding: 8px 10px; border-bottom: 1px solid #E5E7EB; font-weight: 600;">B · Arc-back</th>
+          <th style="padding: 8px 10px; border-bottom: 1px solid #E5E7EB; font-weight: 600;">C · Swimlanes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Loop readability</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6; color: #B91C1C;">✗ Invisible</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Read arc + badge count</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Count nodes on the lane</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">≥3 loop groups</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">N/A (loops not shown)</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">⚠️ Needs layering + colors</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">✅ Just add another lane</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">filter_by visualization</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6; color: #B91C1C;">✗ Invisible</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Bottom bracket overlay</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Top pill + column bracket</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Vertical space</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">~140px (compact)</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">~120–220px</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">One row per label; E3 ~440px</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Simple case (C4)</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Sufficient</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Degrades to linear</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">3 steps over 3 rows feels sparse</td></tr>
+        <tr><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">"Stuck" semantics</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6; color: #B91C1C;">✗ Not visible</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Arc = spinning in place</td><td style="padding: 8px 10px; border-bottom: 1px solid #F3F4F6;">Lane is crossed repeatedly</td></tr>
+        <tr><td style="padding: 8px 10px;">Implementation complexity</td><td style="padding: 8px 10px;">Already exists</td><td style="padding: 8px 10px;">Update adapter + add SVG arc layer</td><td style="padding: 8px 10px;">Update adapter + rewrite layout (lane assignment + orthogonal paths)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
