@@ -476,7 +476,7 @@
 
     <!-- =================== C · swim + time (step lane × time) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · upward edge = loop-back</span>
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · horizontal = Δt · 90° corner = lane change</span>
       <svg viewBox="0 0 1400 320" style="width: 100%; height: 320px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
@@ -532,25 +532,41 @@
           <text x="1060" y="307" text-anchor="middle">90s</text>
           <text x="1360" y="307" text-anchor="middle">120s</text>
         </g>
-        <!-- Edges (consecutive nodes, straight lines; cyan/purple when destination is a loop-step revisit) -->
-        <line x1="160" y1="85" x2="210" y2="120" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="210" y1="120" x2="240" y2="155" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="240" y1="155" x2="260" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
-        <line x1="260" y1="120" x2="310" y2="190" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="310" y1="190" x2="460" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
-        <line x1="460" y1="120" x2="510" y2="225" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="510" y1="225" x2="760" y2="190" stroke="#A855F7" stroke-width="1.8"/>
-        <line x1="760" y1="190" x2="1360" y2="260" stroke="#9CA3AF" stroke-width="1.5"/>
-        <!-- Δt labels (mid-edge, small offsets to avoid collisions) -->
+        <!-- Edges: horizontal segment carries Δt (solid, color-coded for loop); vertical segment is just a lane-change connector (dashed, lighter) -->
+        <!-- 1→2: 5s on Greeting lane, then drop to Refund req lane -->
+        <line x1="160" y1="85"  x2="210" y2="85"  stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="210" y1="85"  x2="210" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 2→3: 3s on Refund req lane, then drop to Session restart lane -->
+        <line x1="210" y1="120" x2="240" y2="120" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="240" y1="120" x2="240" y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 3→4: 2s on Session restart lane, then jump UP back to Refund req (loop) -->
+        <line x1="240" y1="155" x2="260" y2="155" stroke="#06B6D4" stroke-width="2"/>
+        <line x1="260" y1="155" x2="260" y2="120" stroke="#06B6D4" stroke-width="1" stroke-dasharray="2,2" opacity="0.75"/>
+        <!-- 4→5: 5s on Refund req lane, then drop to Pending lane -->
+        <line x1="260" y1="120" x2="310" y2="120" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="310" y1="120" x2="310" y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 5→6: 15s on Pending lane, then jump UP back to Refund req (loop) -->
+        <line x1="310" y1="190" x2="460" y2="190" stroke="#06B6D4" stroke-width="2"/>
+        <line x1="460" y1="190" x2="460" y2="120" stroke="#06B6D4" stroke-width="1" stroke-dasharray="2,2" opacity="0.75"/>
+        <!-- 6→7: 5s on Refund req lane, then drop to Process init lane -->
+        <line x1="460" y1="120" x2="510" y2="120" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="510" y1="120" x2="510" y2="225" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 7→8: 25s on Process init lane, then jump UP back to Pending (loop) -->
+        <line x1="510" y1="225" x2="760" y2="225" stroke="#A855F7" stroke-width="2"/>
+        <line x1="760" y1="225" x2="760" y2="190" stroke="#A855F7" stroke-width="1" stroke-dasharray="2,2" opacity="0.75"/>
+        <!-- 8→9: 60s wait on Pending lane, then drop to Info verify lane -->
+        <line x1="760" y1="190" x2="1360" y2="190" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="1360" y1="190" x2="1360" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- Δt labels (centered above each horizontal segment) -->
         <g font-size="9" fill="#6B7280">
-          <text x="178" y="98" text-anchor="middle">5s</text>
-          <text x="220" y="132" text-anchor="middle">3s</text>
-          <text x="262" y="132" text-anchor="middle" fill="#0891B2">2s</text>
-          <text x="278" y="148" text-anchor="middle">5s</text>
-          <text x="385" y="148" text-anchor="middle" fill="#0891B2">15s</text>
-          <text x="480" y="170" text-anchor="middle">5s</text>
-          <text x="635" y="200" text-anchor="middle" fill="#7E22CE">25s</text>
-          <text x="1060" y="218" text-anchor="middle" font-weight="600">60s wait</text>
+          <text x="185" y="80"  text-anchor="middle">5s</text>
+          <text x="225" y="115" text-anchor="middle">3s</text>
+          <text x="250" y="150" text-anchor="middle" fill="#0891B2" font-weight="600">2s</text>
+          <text x="285" y="115" text-anchor="middle">5s</text>
+          <text x="385" y="185" text-anchor="middle" fill="#0891B2" font-weight="600">15s</text>
+          <text x="485" y="115" text-anchor="middle">5s</text>
+          <text x="635" y="220" text-anchor="middle" fill="#7E22CE" font-weight="600">25s</text>
+          <text x="1060" y="185" text-anchor="middle" font-weight="600">60s wait</text>
         </g>
         <!-- Nodes -->
         <g>
@@ -568,7 +584,7 @@
       <div class="tradeoff">
         <p class="pro"><strong>Same step = same lane, perfectly aligned</strong> — Refund req (2, 4, 6) share one horizontal lane; Pending (5, 8) share another. The swimlane property is fully preserved, just rotated 90° from the original column layout.</p>
         <p class="pro"><strong>x = cumulative time, no compromises</strong> — every node's x position is its real timestamp; horizontal distance between any two nodes is their actual Δt.</p>
-        <p class="pro"><strong>Loop direction is in the edge slope</strong> — edges going up = revisiting an earlier step (loop-back); edges going down = a new step further along. The chart visually "trends down" overall but darts back up at every loop.</p>
+        <p class="pro"><strong>Horizontal = time, 90° corner = lane change</strong> — the solid horizontal segment's length equals Δt (color-coded cyan/purple when the next step is a loop-revisit); the dashed vertical drop is just a connector with no time meaning. Loop-backs read as an upward dashed jump at the next event's x-position.</p>
         <p class="con"><strong>Vertical real estate scales with unique step count</strong> — 6 steps → 6 lanes here. Patterns with 10+ unique steps need a taller chart or a scrollable y-axis.</p>
         <p class="con"><strong>Heavy-tail Δt still blows up width</strong> — the 60s gap dominates the right half of the viewBox; same log-scale or clipping consideration as Distance.</p>
       </div>
