@@ -474,77 +474,84 @@
       </div>
     </div>
 
-    <!-- =================== C · swim + time (hybrid) =================== -->
+    <!-- =================== C · swim + time (cumulative) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">row-break preserved · within-row x ∝ Δt (no forced column alignment)</span>
-      <svg viewBox="0 0 900 290" style="width: 100%; height: 290px;">
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">row-break preserved · x = cumulative time across all rows (10 px / sec)</span>
+      <svg viewBox="0 0 1340 290" style="width: 100%; height: 290px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
           <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off</text>
           <circle cx="80" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="90" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
           <circle cx="220" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="230" y="9" fill="#6B21A8" font-weight="600">Pending (loop)</text>
-          <text x="380" y="9" fill="#6B7280" font-style="italic">row break = loop-back · 12 px / sec inside each row</text>
+          <text x="380" y="9" fill="#6B7280" font-style="italic">row break = loop-back · fold-arc horizontal length = Δt of the loop transition</text>
         </g>
-        <!-- Top time scale (applies within each row) -->
+        <!-- Cumulative-time axis (top) -->
+        <line x1="80" y1="36" x2="1280" y2="36" stroke="#E5E7EB"/>
         <g font-size="9" fill="#9CA3AF">
-          <text x="80" y="42" text-anchor="middle">0s</text>
-          <text x="260" y="42" text-anchor="middle">15s</text>
-          <text x="440" y="42" text-anchor="middle">30s</text>
-          <text x="620" y="42" text-anchor="middle">45s</text>
-          <text x="800" y="42" text-anchor="middle">60s</text>
+          <line x1="80" y1="36" x2="80" y2="40" stroke="#9CA3AF"/>
+          <line x1="380" y1="36" x2="380" y2="40" stroke="#9CA3AF"/>
+          <line x1="680" y1="36" x2="680" y2="40" stroke="#9CA3AF"/>
+          <line x1="980" y1="36" x2="980" y2="40" stroke="#9CA3AF"/>
+          <line x1="1280" y1="36" x2="1280" y2="40" stroke="#9CA3AF"/>
+          <text x="80" y="52" text-anchor="middle">0s</text>
+          <text x="380" y="52" text-anchor="middle">30s</text>
+          <text x="680" y="52" text-anchor="middle">60s</text>
+          <text x="980" y="52" text-anchor="middle">90s</text>
+          <text x="1280" y="52" text-anchor="middle">120s</text>
         </g>
         <!-- subtle vertical gridlines -->
         <g stroke="#F3F4F6" stroke-width="1">
-          <line x1="80" y1="48" x2="80" y2="272"/>
-          <line x1="260" y1="48" x2="260" y2="272"/>
-          <line x1="440" y1="48" x2="440" y2="272"/>
-          <line x1="620" y1="48" x2="620" y2="272"/>
-          <line x1="800" y1="48" x2="800" y2="272"/>
+          <line x1="80" y1="58" x2="80" y2="280"/>
+          <line x1="380" y1="58" x2="380" y2="280"/>
+          <line x1="680" y1="58" x2="680" y2="280"/>
+          <line x1="980" y1="58" x2="980" y2="280"/>
+          <line x1="1280" y1="58" x2="1280" y2="280"/>
         </g>
-        <!-- Row 1: 1@80 → 2@140 (5s) → 3@176 (3s) → fold to row 2 -->
-        <path d="M 92 80 H 128" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 152 80 H 164" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 176 92 V 110 H 80 V 128" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
-        <!-- Row 2: 4@80 → 5@140 (5s) → fold to row 3 -->
-        <path d="M 92 140 H 128" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 140 152 V 170 H 80 V 188" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
-        <!-- Row 3: 6@80 → 7@140 (5s) → fold to row 4 -->
-        <path d="M 92 200 H 128" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 140 212 V 230 H 80 V 248" fill="none" stroke="#A855F7" stroke-width="1.8"/>
-        <!-- Row 4: 8@80 → 9@800 (60s, full stretch) -->
-        <path d="M 92 260 H 788" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <!-- Δt labels -->
+        <!-- Row 1: 1@80 → 2@130 (5s) → 3@160 (3s) → fold to row 2 -->
+        <path d="M 92 80 H 118" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 142 80 H 148" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 160 92 V 110 H 180 V 128" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <!-- Row 2: 4@180 → 5@230 (5s) → fold to row 3 -->
+        <path d="M 192 140 H 218" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 230 152 V 170 H 380 V 188" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <!-- Row 3: 6@380 → 7@430 (5s) → fold to row 4 -->
+        <path d="M 392 200 H 418" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <path d="M 430 212 V 230 H 680 V 248" fill="none" stroke="#A855F7" stroke-width="1.8"/>
+        <!-- Row 4: 8@680 → 9@1280 (60s) -->
+        <path d="M 692 260 H 1268" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
+        <!-- Δt labels (mid-edge) -->
         <g font-size="9" fill="#6B7280">
-          <text x="110" y="74" text-anchor="middle">5s</text>
-          <text x="158" y="74" text-anchor="middle">3s</text>
-          <text x="128" y="104" text-anchor="middle" fill="#0891B2">2s</text>
-          <text x="110" y="134" text-anchor="middle">5s</text>
-          <text x="110" y="164" text-anchor="middle" fill="#0891B2">15s</text>
-          <text x="110" y="194" text-anchor="middle">5s</text>
-          <text x="110" y="224" text-anchor="middle" fill="#7E22CE">25s</text>
-          <text x="440" y="254" text-anchor="middle" font-weight="600">60s wait</text>
+          <text x="105" y="74" text-anchor="middle">5s</text>
+          <text x="145" y="74" text-anchor="middle">3s</text>
+          <text x="170" y="104" text-anchor="middle" fill="#0891B2">2s</text>
+          <text x="205" y="134" text-anchor="middle">5s</text>
+          <text x="305" y="164" text-anchor="middle" fill="#0891B2">15s</text>
+          <text x="405" y="194" text-anchor="middle">5s</text>
+          <text x="555" y="224" text-anchor="middle" fill="#7E22CE">25s</text>
+          <text x="980" y="254" text-anchor="middle" font-weight="600">60s wait</text>
         </g>
         <!-- Nodes -->
         <g><circle cx="80" cy="80" r="12" fill="#9CA3AF"/><text x="80" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
-        <g><circle cx="140" cy="80" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="140" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
-        <g><circle cx="176" cy="80" r="12" fill="#9CA3AF"/><text x="176" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
-        <g><circle cx="80" cy="140" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="80" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
-        <g><circle cx="140" cy="140" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="140" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
-        <g><circle cx="80" cy="200" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="80" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
-        <g><circle cx="140" cy="200" r="12" fill="#9CA3AF"/><text x="140" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
-        <g><circle cx="80" cy="260" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="80" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
-        <g><circle cx="800" cy="260" r="12" fill="#9CA3AF"/><text x="800" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+        <g><circle cx="130" cy="80" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="130" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+        <g><circle cx="160" cy="80" r="12" fill="#9CA3AF"/><text x="160" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+        <g><circle cx="180" cy="140" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="180" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+        <g><circle cx="230" cy="140" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="230" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+        <g><circle cx="380" cy="200" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="380" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+        <g><circle cx="430" cy="200" r="12" fill="#9CA3AF"/><text x="430" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+        <g><circle cx="680" cy="260" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="680" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
+        <g><circle cx="1280" cy="260" r="12" fill="#9CA3AF"/><text x="1280" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
       </svg>
       <div class="tradeoff">
-        <p class="pro"><strong>Loop-back is preserved</strong> — every fold-down still means "the user repeated a step"; the row-stack remains the structural headline.</p>
-        <p class="pro"><strong>Δt visible per edge without re-doing the layout</strong> — same px/sec across all rows, so 5s in Row 2 looks the same as 5s in Row 4. The narrow rows compress the early loop; the long Row 4 makes the final 60s wait dominant.</p>
-        <p class="con"><strong>Same-step column alignment is lost</strong> — Refund req nodes (2, 4, 6) sit at different x positions. Loops have to be read off color, not column.</p>
-        <p class="con"><strong>X is row-relative, not cumulative</strong> — you can't read "node 8 happened at t = 75s" off the x-axis; only "node 8 was the first event of Row 4." Cumulative timing needs row totals (or a small annotation per row).</p>
+        <p class="pro"><strong>Loop-back is structurally visible</strong> — every fold-down still means "the user repeated a step"; the row-stack remains the headline without needing dashed arcs.</p>
+        <p class="pro"><strong>x = cumulative time everywhere</strong> — you can read "node 8 happened at t = 60s" directly off the axis; same scale across all rows, no row-relative reset.</p>
+        <p class="pro"><strong>Fold-arcs encode their own Δt</strong> — the horizontal stretch of the cyan/purple fold is the wait between the source step and its loop-back (2s, 15s, 25s here).</p>
+        <p class="con"><strong>Folds go down-and-right, not down-and-left</strong> — because time advances monotonically. Reads less like "U-turn back to a column" and more like "new lane starts after a loop"; color carries the loop identity.</p>
+        <p class="con"><strong>Heavy-tail Δt blows up width</strong> — the 60s gap dominates the viewBox; needs log-scale or clipping when waits are uneven.</p>
       </div>
     </div>
 
     <div style="margin-top: 14px; padding: 10px 14px; background: #F5F3FF; border-left: 3px solid #A855F7; border-radius: 0 6px 6px 0; font-size: 12px; color: #5B21B6; line-height: 1.55;">
-      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> is the middle ground — keeps the row-break-on-loop story but trades strict column alignment for per-edge spacing. <em>Distance</em> when the question is "where does the user actually spend time?" — abandoning swimlanes is worth it to get a true cumulative time axis. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
+      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> is the middle ground — same cumulative time axis as Distance, but row breaks on loop-back keep the structural narrative legible without dashed arcs. <em>Distance</em> when you want the most compact single-row time axis and don't mind reading loops off arcs + color. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
     </div>
   </section>
 
