@@ -474,108 +474,145 @@
       </div>
     </div>
 
-    <!-- =================== C · swim + time (step lane × time) =================== -->
+    <!-- =================== C · swim + time (banded fold-back) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · upward edge = loop-back</span>
-      <svg viewBox="0 0 1400 320" style="width: 100%; height: 320px;">
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">band wraps on loop-back · y = step lane within each band · x = cumulative time (10 px / sec)</span>
+      <svg viewBox="0 0 1400 370" style="width: 100%; height: 370px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
           <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off step</text>
           <circle cx="100" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="110" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
           <circle cx="240" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="250" y="9" fill="#6B21A8" font-weight="600">Pending (loop)</text>
-          <text x="380" y="9" fill="#6B7280" font-style="italic">every event lands on its step's row → loops are visits to the same lane, edge slope shows direction</text>
+          <text x="380" y="9" fill="#6B7280" font-style="italic">colored fold-arc = loop-back to a new band · arc horizontal length = Δt of the transition</text>
         </g>
-        <!-- Loop-lane background tints -->
-        <rect x="158" y="105" width="1212" height="30" fill="#ECFEFF" opacity="0.5"/>
-        <rect x="158" y="175" width="1212" height="30" fill="#F5F3FF" opacity="0.5"/>
-        <!-- Row guidelines (faint horizontals) -->
+        <!-- Vertical time gridlines (full height, subtle) -->
         <g stroke="#F3F4F6" stroke-width="1">
-          <line x1="160" y1="85" x2="1370" y2="85"/>
+          <line x1="460" y1="70" x2="460" y2="320"/>
+          <line x1="760" y1="70" x2="760" y2="320"/>
+          <line x1="1060" y1="70" x2="1060" y2="320"/>
+          <line x1="1360" y1="70" x2="1360" y2="320"/>
+        </g>
+        <!-- Y-axis vertical line -->
+        <line x1="160" y1="70" x2="160" y2="320" stroke="#D1D5DB" stroke-width="1"/>
+
+        <!-- Band 1 (events 1-3): Greeting / Refund req / Session restart -->
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="160" y1="80" x2="1370" y2="80"/>
+          <line x1="160" y1="100" x2="1370" y2="100"/>
           <line x1="160" y1="120" x2="1370" y2="120"/>
-          <line x1="160" y1="155" x2="1370" y2="155"/>
-          <line x1="160" y1="190" x2="1370" y2="190"/>
-          <line x1="160" y1="225" x2="1370" y2="225"/>
-          <line x1="160" y1="260" x2="1370" y2="260"/>
         </g>
-        <!-- Vertical time gridlines (subtle) -->
+        <rect x="158" y="92" width="1212" height="16" fill="#ECFEFF" opacity="0.55"/>
+        <g font-size="10" fill="#374151">
+          <text x="152" y="84" text-anchor="end">Greeting</text>
+          <text x="152" y="104" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="152" y="124" text-anchor="end">Session restart</text>
+        </g>
+
+        <!-- Band 2 (events 4-5): Refund req / Pending -->
         <g stroke="#F3F4F6" stroke-width="1">
-          <line x1="460" y1="70" x2="460" y2="278"/>
-          <line x1="760" y1="70" x2="760" y2="278"/>
-          <line x1="1060" y1="70" x2="1060" y2="278"/>
-          <line x1="1360" y1="70" x2="1360" y2="278"/>
+          <line x1="160" y1="160" x2="1370" y2="160"/>
+          <line x1="160" y1="180" x2="1370" y2="180"/>
         </g>
-        <!-- Y-axis line -->
-        <line x1="160" y1="70" x2="160" y2="278" stroke="#D1D5DB" stroke-width="1"/>
-        <!-- Y-axis: step labels -->
-        <g font-size="10.5" fill="#374151">
-          <text x="152" y="89" text-anchor="end">Greeting</text>
-          <text x="152" y="124" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
-          <text x="152" y="159" text-anchor="end">Session restart</text>
-          <text x="152" y="194" text-anchor="end" fill="#6B21A8" font-weight="600">Pending action</text>
-          <text x="152" y="229" text-anchor="end">Process initiated</text>
-          <text x="152" y="264" text-anchor="end">Info verify</text>
+        <rect x="158" y="152" width="1212" height="16" fill="#ECFEFF" opacity="0.55"/>
+        <rect x="158" y="172" width="1212" height="16" fill="#F5F3FF" opacity="0.55"/>
+        <g font-size="10" fill="#374151">
+          <text x="152" y="164" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="152" y="184" text-anchor="end" fill="#6B21A8" font-weight="600">Pending action</text>
         </g>
-        <!-- Loop count badges next to loop-step labels -->
-        <text x="148" y="138" text-anchor="end" font-size="9" fill="#0891B2" font-weight="600">× 3</text>
-        <text x="148" y="208" text-anchor="end" font-size="9" fill="#7E22CE" font-weight="600">× 2</text>
+
+        <!-- Band 3 (events 6-7): Refund req / Process init -->
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="160" y1="220" x2="1370" y2="220"/>
+          <line x1="160" y1="240" x2="1370" y2="240"/>
+        </g>
+        <rect x="158" y="212" width="1212" height="16" fill="#ECFEFF" opacity="0.55"/>
+        <g font-size="10" fill="#374151">
+          <text x="152" y="224" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="152" y="244" text-anchor="end">Process initiated</text>
+        </g>
+
+        <!-- Band 4 (events 8-9): Pending / Info verify -->
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="160" y1="280" x2="1370" y2="280"/>
+          <line x1="160" y1="300" x2="1370" y2="300"/>
+        </g>
+        <rect x="158" y="272" width="1212" height="16" fill="#F5F3FF" opacity="0.55"/>
+        <g font-size="10" fill="#374151">
+          <text x="152" y="284" text-anchor="end" fill="#6B21A8" font-weight="600">Pending action</text>
+          <text x="152" y="304" text-anchor="end">Info verify</text>
+        </g>
+
+        <!-- Band separator dashed lines -->
+        <g stroke="#E5E7EB" stroke-width="0.7" stroke-dasharray="3 3">
+          <line x1="40" y1="142" x2="1370" y2="142"/>
+          <line x1="40" y1="202" x2="1370" y2="202"/>
+          <line x1="40" y1="262" x2="1370" y2="262"/>
+        </g>
+
         <!-- Time axis (bottom) -->
-        <line x1="160" y1="290" x2="1360" y2="290" stroke="#D1D5DB" stroke-width="1"/>
+        <line x1="160" y1="335" x2="1360" y2="335" stroke="#D1D5DB" stroke-width="1"/>
         <g font-size="9" fill="#6B7280">
-          <line x1="160" y1="290" x2="160" y2="294" stroke="#9CA3AF"/>
-          <line x1="460" y1="290" x2="460" y2="294" stroke="#9CA3AF"/>
-          <line x1="760" y1="290" x2="760" y2="294" stroke="#9CA3AF"/>
-          <line x1="1060" y1="290" x2="1060" y2="294" stroke="#9CA3AF"/>
-          <line x1="1360" y1="290" x2="1360" y2="294" stroke="#9CA3AF"/>
-          <text x="160" y="307" text-anchor="middle">0s</text>
-          <text x="460" y="307" text-anchor="middle">30s</text>
-          <text x="760" y="307" text-anchor="middle">60s</text>
-          <text x="1060" y="307" text-anchor="middle">90s</text>
-          <text x="1360" y="307" text-anchor="middle">120s</text>
+          <line x1="160" y1="335" x2="160" y2="339" stroke="#9CA3AF"/>
+          <line x1="460" y1="335" x2="460" y2="339" stroke="#9CA3AF"/>
+          <line x1="760" y1="335" x2="760" y2="339" stroke="#9CA3AF"/>
+          <line x1="1060" y1="335" x2="1060" y2="339" stroke="#9CA3AF"/>
+          <line x1="1360" y1="335" x2="1360" y2="339" stroke="#9CA3AF"/>
+          <text x="160" y="352" text-anchor="middle">0s</text>
+          <text x="460" y="352" text-anchor="middle">30s</text>
+          <text x="760" y="352" text-anchor="middle">60s</text>
+          <text x="1060" y="352" text-anchor="middle">90s</text>
+          <text x="1360" y="352" text-anchor="middle">120s</text>
         </g>
-        <!-- Edges (consecutive nodes, straight lines; cyan/purple when destination is a loop-step revisit) -->
-        <line x1="160" y1="85" x2="210" y2="120" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="210" y1="120" x2="240" y2="155" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="240" y1="155" x2="260" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
-        <line x1="260" y1="120" x2="310" y2="190" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="310" y1="190" x2="460" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
-        <line x1="460" y1="120" x2="510" y2="225" stroke="#9CA3AF" stroke-width="1.5"/>
-        <line x1="510" y1="225" x2="760" y2="190" stroke="#A855F7" stroke-width="1.8"/>
-        <line x1="760" y1="190" x2="1360" y2="260" stroke="#9CA3AF" stroke-width="1.5"/>
-        <!-- Δt labels (mid-edge, small offsets to avoid collisions) -->
+
+        <!-- Within-band edges (grey diagonals) -->
+        <line x1="160" y1="80" x2="210" y2="100" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="210" y1="100" x2="240" y2="120" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="260" y1="160" x2="310" y2="180" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="460" y1="220" x2="510" y2="240" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="760" y1="280" x2="1360" y2="300" stroke="#9CA3AF" stroke-width="1.5"/>
+
+        <!-- Between-band fold-arcs (loop-back, orthogonal, colored) -->
+        <path d="M 240 120 V 142 H 260 V 160" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <path d="M 310 180 V 202 H 460 V 220" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
+        <path d="M 510 240 V 262 H 760 V 280" fill="none" stroke="#A855F7" stroke-width="1.8"/>
+
+        <!-- Δt labels -->
         <g font-size="9" fill="#6B7280">
-          <text x="178" y="98" text-anchor="middle">5s</text>
-          <text x="220" y="132" text-anchor="middle">3s</text>
-          <text x="262" y="132" text-anchor="middle" fill="#0891B2">2s</text>
-          <text x="278" y="148" text-anchor="middle">5s</text>
-          <text x="385" y="148" text-anchor="middle" fill="#0891B2">15s</text>
-          <text x="480" y="170" text-anchor="middle">5s</text>
-          <text x="635" y="200" text-anchor="middle" fill="#7E22CE">25s</text>
-          <text x="1060" y="218" text-anchor="middle" font-weight="600">60s wait</text>
+          <text x="185" y="88" text-anchor="middle">5s</text>
+          <text x="225" y="108" text-anchor="middle">3s</text>
+          <text x="250" y="138" text-anchor="middle" fill="#0891B2">2s</text>
+          <text x="285" y="168" text-anchor="middle">5s</text>
+          <text x="385" y="198" text-anchor="middle" fill="#0891B2">15s</text>
+          <text x="485" y="228" text-anchor="middle">5s</text>
+          <text x="635" y="258" text-anchor="middle" fill="#7E22CE">25s</text>
+          <text x="1060" y="288" text-anchor="middle" font-weight="600">60s wait</text>
         </g>
+
         <!-- Nodes -->
         <g>
-          <g><circle cx="160" cy="85" r="11" fill="#9CA3AF"/><text x="160" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
-          <g><circle cx="210" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="210" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
-          <g><circle cx="240" cy="155" r="11" fill="#9CA3AF"/><text x="240" y="159" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
-          <g><circle cx="260" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="260" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
-          <g><circle cx="310" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="310" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
-          <g><circle cx="460" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="460" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
-          <g><circle cx="510" cy="225" r="11" fill="#9CA3AF"/><text x="510" y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
-          <g><circle cx="760" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="760" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
-          <g><circle cx="1360" cy="260" r="11" fill="#9CA3AF"/><text x="1360" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+          <g><circle cx="160" cy="80" r="9" fill="#9CA3AF"/><text x="160" y="83" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">1</text></g>
+          <g><circle cx="210" cy="100" r="9" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="210" y="103" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">2</text></g>
+          <g><circle cx="240" cy="120" r="9" fill="#9CA3AF"/><text x="240" y="123" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">3</text></g>
+          <g><circle cx="260" cy="160" r="9" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="260" y="163" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">4</text></g>
+          <g><circle cx="310" cy="180" r="9" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="310" y="183" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">5</text></g>
+          <g><circle cx="460" cy="220" r="9" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="460" y="223" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">6</text></g>
+          <g><circle cx="510" cy="240" r="9" fill="#9CA3AF"/><text x="510" y="243" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">7</text></g>
+          <g><circle cx="760" cy="280" r="9" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="760" y="283" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">8</text></g>
+          <g><circle cx="1360" cy="300" r="9" fill="#9CA3AF"/><text x="1360" y="303" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">9</text></g>
         </g>
       </svg>
       <div class="tradeoff">
-        <p class="pro"><strong>Same step = same lane, perfectly aligned</strong> — Refund req (2, 4, 6) share one horizontal lane; Pending (5, 8) share another. The swimlane property is fully preserved, just rotated 90° from the original column layout.</p>
-        <p class="pro"><strong>x = cumulative time, no compromises</strong> — every node's x position is its real timestamp; horizontal distance between any two nodes is their actual Δt.</p>
-        <p class="pro"><strong>Loop direction is in the edge slope</strong> — edges going up = revisiting an earlier step (loop-back); edges going down = a new step further along. The chart visually "trends down" overall but darts back up at every loop.</p>
-        <p class="con"><strong>Vertical real estate scales with unique step count</strong> — 6 steps → 6 lanes here. Patterns with 10+ unique steps need a taller chart or a scrollable y-axis.</p>
-        <p class="con"><strong>Heavy-tail Δt still blows up width</strong> — the 60s gap dominates the right half of the viewBox; same log-scale or clipping consideration as Distance.</p>
+        <p class="pro"><strong>Fold-back is unmistakable</strong> — every loop-back drops to a new band with a colored orthogonal arc; you read "user looped back to Refund req" without parsing edge slopes.</p>
+        <p class="pro"><strong>Step labels are always next to their node</strong> — inside each band, every step has its own labeled lane; no need to map a node back to a distant y-axis lane.</p>
+        <p class="pro"><strong>x = cumulative time</strong> — same scale across all bands; node x = real timestamp; arc horizontal length = the Δt of the loop transition (2s, 15s, 25s).</p>
+        <p class="con"><strong>Lane labels repeat across bands</strong> — "Refund request" appears 3 times on the left (once per band where it's visited). The label cost is the price of preserving fold-back structure.</p>
+        <p class="con"><strong>Vertical real estate grows with loop count</strong> — one band per (initial + loop-back). Patterns with many loops need more vertical space than the single-band step-lane layout.</p>
+        <p class="con"><strong>Heavy-tail Δt still blows up width</strong> — the 60s gap dominates the right half of the viewBox.</p>
       </div>
     </div>
 
     <div style="margin-top: 14px; padding: 10px 14px; background: #F5F3FF; border-left: 3px solid #A855F7; border-radius: 0 6px 6px 0; font-size: 12px; color: #5B21B6; line-height: 1.55;">
-      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> is the strongest hybrid — same-step lanes (swimlane) + real time axis (distance); loops read as visits to the same row, time reads off the x-axis. <em>Distance</em> when you want the most compact single-row time axis and don't mind reading loops off arcs + color. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
+      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> keeps the original C swimlane's row-fold story but layers a real time axis on top — fold-arcs are loop-backs, arc length is the loop's Δt, every node sits next to its step label. <em>Distance</em> when you want the most compact single-row time axis and don't mind reading loops off arcs + color. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
     </div>
   </section>
 
