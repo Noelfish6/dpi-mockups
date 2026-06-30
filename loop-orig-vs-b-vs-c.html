@@ -474,95 +474,108 @@
       </div>
     </div>
 
-    <!-- =================== C · swim + time (cumulative) =================== -->
+    <!-- =================== C · swim + time (step lane × time) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">row-break preserved · x = cumulative time across all rows (10 px / sec)</span>
-      <svg viewBox="0 0 1340 290" style="width: 100%; height: 290px;">
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · upward edge = loop-back</span>
+      <svg viewBox="0 0 1400 320" style="width: 100%; height: 320px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
-          <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off</text>
-          <circle cx="80" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="90" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
-          <circle cx="220" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="230" y="9" fill="#6B21A8" font-weight="600">Pending (loop)</text>
-          <text x="380" y="9" fill="#6B7280" font-style="italic">row break = loop-back · matching cell color = same step instance</text>
+          <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off step</text>
+          <circle cx="100" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="110" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
+          <circle cx="240" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="250" y="9" fill="#6B21A8" font-weight="600">Pending (loop)</text>
+          <text x="380" y="9" fill="#6B7280" font-style="italic">every event lands on its step's row → loops are visits to the same lane, edge slope shows direction</text>
         </g>
-        <!-- Cumulative-time axis (top) -->
-        <line x1="80" y1="36" x2="1280" y2="36" stroke="#E5E7EB"/>
-        <g font-size="9" fill="#9CA3AF">
-          <line x1="80" y1="36" x2="80" y2="40" stroke="#9CA3AF"/>
-          <line x1="380" y1="36" x2="380" y2="40" stroke="#9CA3AF"/>
-          <line x1="680" y1="36" x2="680" y2="40" stroke="#9CA3AF"/>
-          <line x1="980" y1="36" x2="980" y2="40" stroke="#9CA3AF"/>
-          <line x1="1280" y1="36" x2="1280" y2="40" stroke="#9CA3AF"/>
-          <text x="80" y="52" text-anchor="middle">0s</text>
-          <text x="380" y="52" text-anchor="middle">30s</text>
-          <text x="680" y="52" text-anchor="middle">60s</text>
-          <text x="980" y="52" text-anchor="middle">90s</text>
-          <text x="1280" y="52" text-anchor="middle">120s</text>
-        </g>
-        <!-- subtle vertical gridlines -->
+        <!-- Loop-lane background tints -->
+        <rect x="158" y="105" width="1212" height="30" fill="#ECFEFF" opacity="0.5"/>
+        <rect x="158" y="175" width="1212" height="30" fill="#F5F3FF" opacity="0.5"/>
+        <!-- Row guidelines (faint horizontals) -->
         <g stroke="#F3F4F6" stroke-width="1">
-          <line x1="80" y1="58" x2="80" y2="280"/>
-          <line x1="380" y1="58" x2="380" y2="280"/>
-          <line x1="680" y1="58" x2="680" y2="280"/>
-          <line x1="980" y1="58" x2="980" y2="280"/>
-          <line x1="1280" y1="58" x2="1280" y2="280"/>
+          <line x1="160" y1="85" x2="1370" y2="85"/>
+          <line x1="160" y1="120" x2="1370" y2="120"/>
+          <line x1="160" y1="155" x2="1370" y2="155"/>
+          <line x1="160" y1="190" x2="1370" y2="190"/>
+          <line x1="160" y1="225" x2="1370" y2="225"/>
+          <line x1="160" y1="260" x2="1370" y2="260"/>
         </g>
-        <!-- Loop-group cells: light cyan behind every Refund-req node (2,4,6); light purple behind every Pending node (5,8). Same color = same step. -->
-        <g>
-          <!-- Refund req group (cyan) -->
-          <rect x="112" y="62" width="36" height="36" rx="10" fill="#ECFEFF" stroke="#06B6D4" stroke-width="0.6" stroke-opacity="0.55"/>
-          <rect x="162" y="122" width="36" height="36" rx="10" fill="#ECFEFF" stroke="#06B6D4" stroke-width="0.6" stroke-opacity="0.55"/>
-          <rect x="362" y="182" width="36" height="36" rx="10" fill="#ECFEFF" stroke="#06B6D4" stroke-width="0.6" stroke-opacity="0.55"/>
-          <!-- Pending group (purple) -->
-          <rect x="212" y="122" width="36" height="36" rx="10" fill="#F5F3FF" stroke="#A855F7" stroke-width="0.6" stroke-opacity="0.55"/>
-          <rect x="662" y="242" width="36" height="36" rx="10" fill="#F5F3FF" stroke="#A855F7" stroke-width="0.6" stroke-opacity="0.55"/>
+        <!-- Vertical time gridlines (subtle) -->
+        <g stroke="#F3F4F6" stroke-width="1">
+          <line x1="460" y1="70" x2="460" y2="278"/>
+          <line x1="760" y1="70" x2="760" y2="278"/>
+          <line x1="1060" y1="70" x2="1060" y2="278"/>
+          <line x1="1360" y1="70" x2="1360" y2="278"/>
         </g>
-        <!-- Row 1: 1@80 → 2@130 (5s) → 3@160 (3s) → fold to row 2 -->
-        <path d="M 92 80 H 118" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 142 80 H 148" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 160 92 V 110 H 180 V 128" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
-        <!-- Row 2: 4@180 → 5@230 (5s) → fold to row 3 -->
-        <path d="M 192 140 H 218" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 230 152 V 170 H 380 V 188" fill="none" stroke="#06B6D4" stroke-width="1.8"/>
-        <!-- Row 3: 6@380 → 7@430 (5s) → fold to row 4 -->
-        <path d="M 392 200 H 418" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <path d="M 430 212 V 230 H 680 V 248" fill="none" stroke="#A855F7" stroke-width="1.8"/>
-        <!-- Row 4: 8@680 → 9@1280 (60s) -->
-        <path d="M 692 260 H 1268" fill="none" stroke="#9CA3AF" stroke-width="1.5"/>
-        <!-- Δt labels (mid-edge) -->
+        <!-- Y-axis line -->
+        <line x1="160" y1="70" x2="160" y2="278" stroke="#D1D5DB" stroke-width="1"/>
+        <!-- Y-axis: step labels -->
+        <g font-size="10.5" fill="#374151">
+          <text x="152" y="89" text-anchor="end">Greeting</text>
+          <text x="152" y="124" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
+          <text x="152" y="159" text-anchor="end">Session restart</text>
+          <text x="152" y="194" text-anchor="end" fill="#6B21A8" font-weight="600">Pending action</text>
+          <text x="152" y="229" text-anchor="end">Process initiated</text>
+          <text x="152" y="264" text-anchor="end">Info verify</text>
+        </g>
+        <!-- Loop count badges next to loop-step labels -->
+        <text x="148" y="138" text-anchor="end" font-size="9" fill="#0891B2" font-weight="600">× 3</text>
+        <text x="148" y="208" text-anchor="end" font-size="9" fill="#7E22CE" font-weight="600">× 2</text>
+        <!-- Time axis (bottom) -->
+        <line x1="160" y1="290" x2="1360" y2="290" stroke="#D1D5DB" stroke-width="1"/>
         <g font-size="9" fill="#6B7280">
-          <text x="105" y="74" text-anchor="middle">5s</text>
-          <text x="145" y="74" text-anchor="middle">3s</text>
-          <text x="170" y="104" text-anchor="middle" fill="#0891B2">2s</text>
-          <text x="205" y="134" text-anchor="middle">5s</text>
-          <text x="305" y="164" text-anchor="middle" fill="#0891B2">15s</text>
-          <text x="405" y="194" text-anchor="middle">5s</text>
-          <text x="555" y="224" text-anchor="middle" fill="#7E22CE">25s</text>
-          <text x="980" y="254" text-anchor="middle" font-weight="600">60s wait</text>
+          <line x1="160" y1="290" x2="160" y2="294" stroke="#9CA3AF"/>
+          <line x1="460" y1="290" x2="460" y2="294" stroke="#9CA3AF"/>
+          <line x1="760" y1="290" x2="760" y2="294" stroke="#9CA3AF"/>
+          <line x1="1060" y1="290" x2="1060" y2="294" stroke="#9CA3AF"/>
+          <line x1="1360" y1="290" x2="1360" y2="294" stroke="#9CA3AF"/>
+          <text x="160" y="307" text-anchor="middle">0s</text>
+          <text x="460" y="307" text-anchor="middle">30s</text>
+          <text x="760" y="307" text-anchor="middle">60s</text>
+          <text x="1060" y="307" text-anchor="middle">90s</text>
+          <text x="1360" y="307" text-anchor="middle">120s</text>
+        </g>
+        <!-- Edges (consecutive nodes, straight lines; cyan/purple when destination is a loop-step revisit) -->
+        <line x1="160" y1="85" x2="210" y2="120" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="240" y2="155" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="240" y1="155" x2="260" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
+        <line x1="260" y1="120" x2="310" y2="190" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="310" y1="190" x2="460" y2="120" stroke="#06B6D4" stroke-width="1.8"/>
+        <line x1="460" y1="120" x2="510" y2="225" stroke="#9CA3AF" stroke-width="1.5"/>
+        <line x1="510" y1="225" x2="760" y2="190" stroke="#A855F7" stroke-width="1.8"/>
+        <line x1="760" y1="190" x2="1360" y2="260" stroke="#9CA3AF" stroke-width="1.5"/>
+        <!-- Δt labels (mid-edge, small offsets to avoid collisions) -->
+        <g font-size="9" fill="#6B7280">
+          <text x="178" y="98" text-anchor="middle">5s</text>
+          <text x="220" y="132" text-anchor="middle">3s</text>
+          <text x="262" y="132" text-anchor="middle" fill="#0891B2">2s</text>
+          <text x="278" y="148" text-anchor="middle">5s</text>
+          <text x="385" y="148" text-anchor="middle" fill="#0891B2">15s</text>
+          <text x="480" y="170" text-anchor="middle">5s</text>
+          <text x="635" y="200" text-anchor="middle" fill="#7E22CE">25s</text>
+          <text x="1060" y="218" text-anchor="middle" font-weight="600">60s wait</text>
         </g>
         <!-- Nodes -->
-        <g><circle cx="80" cy="80" r="12" fill="#9CA3AF"/><text x="80" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
-        <g><circle cx="130" cy="80" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="130" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
-        <g><circle cx="160" cy="80" r="12" fill="#9CA3AF"/><text x="160" y="84" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
-        <g><circle cx="180" cy="140" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="180" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
-        <g><circle cx="230" cy="140" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="230" y="144" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
-        <g><circle cx="380" cy="200" r="12" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="380" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
-        <g><circle cx="430" cy="200" r="12" fill="#9CA3AF"/><text x="430" y="204" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
-        <g><circle cx="680" cy="260" r="12" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="680" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
-        <g><circle cx="1280" cy="260" r="12" fill="#9CA3AF"/><text x="1280" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+        <g>
+          <g><circle cx="160" cy="85" r="11" fill="#9CA3AF"/><text x="160" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+          <g><circle cx="210" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="210" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+          <g><circle cx="240" cy="155" r="11" fill="#9CA3AF"/><text x="240" y="159" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+          <g><circle cx="260" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="260" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+          <g><circle cx="310" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="310" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+          <g><circle cx="460" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="460" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+          <g><circle cx="510" cy="225" r="11" fill="#9CA3AF"/><text x="510" y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+          <g><circle cx="760" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="760" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
+          <g><circle cx="1360" cy="260" r="11" fill="#9CA3AF"/><text x="1360" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
+        </g>
       </svg>
       <div class="tradeoff">
-        <p class="pro"><strong>Loop-back is structurally visible</strong> — every fold-down still means "the user repeated a step"; the row-stack remains the headline without needing dashed arcs.</p>
-        <p class="pro"><strong>x = cumulative time everywhere</strong> — you can read "node 8 happened at t = 60s" directly off the axis; same scale across all rows, no row-relative reset.</p>
-        <p class="pro"><strong>Fold-arcs encode their own Δt</strong> — the horizontal stretch of the cyan/purple fold is the wait between the source step and its loop-back (2s, 15s, 25s here).</p>
-        <p class="pro"><strong>Light cell background recovers "same-step" identity</strong> — Refund req nodes (2, 4, 6) all sit on a cyan cell; Pending (5, 8) on purple. Perfect column alignment is impossible under a time axis, but matching cell color lets the eye group instances at a glance.</p>
-        <p class="con"><strong>Folds go down-and-right, not down-and-left</strong> — because time advances monotonically. Reads less like "U-turn back to a column" and more like "new lane starts after a loop"; color carries the loop identity.</p>
-        <p class="con"><strong>Heavy-tail Δt blows up width</strong> — the 60s gap dominates the viewBox; needs log-scale or clipping when waits are uneven.</p>
+        <p class="pro"><strong>Same step = same lane, perfectly aligned</strong> — Refund req (2, 4, 6) share one horizontal lane; Pending (5, 8) share another. The swimlane property is fully preserved, just rotated 90° from the original column layout.</p>
+        <p class="pro"><strong>x = cumulative time, no compromises</strong> — every node's x position is its real timestamp; horizontal distance between any two nodes is their actual Δt.</p>
+        <p class="pro"><strong>Loop direction is in the edge slope</strong> — edges going up = revisiting an earlier step (loop-back); edges going down = a new step further along. The chart visually "trends down" overall but darts back up at every loop.</p>
+        <p class="con"><strong>Vertical real estate scales with unique step count</strong> — 6 steps → 6 lanes here. Patterns with 10+ unique steps need a taller chart or a scrollable y-axis.</p>
+        <p class="con"><strong>Heavy-tail Δt still blows up width</strong> — the 60s gap dominates the right half of the viewBox; same log-scale or clipping consideration as Distance.</p>
       </div>
     </div>
 
     <div style="margin-top: 14px; padding: 10px 14px; background: #F5F3FF; border-left: 3px solid #A855F7; border-radius: 0 6px 6px 0; font-size: 12px; color: #5B21B6; line-height: 1.55;">
-      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> is the middle ground — same cumulative time axis as Distance, but row breaks on loop-back keep the structural narrative legible without dashed arcs. <em>Distance</em> when you want the most compact single-row time axis and don't mind reading loops off arcs + color. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
+      <strong>Which to pick?</strong> <em>Thickness</em> when loop structure is the headline and Δt is supporting context — the swimlane carries the narrative, edge weight adds texture. <em>Swim+time</em> is the strongest hybrid — same-step lanes (swimlane) + real time axis (distance); loops read as visits to the same row, time reads off the x-axis. <em>Distance</em> when you want the most compact single-row time axis and don't mind reading loops off arcs + color. They are not mutually exclusive: a UI could let the user toggle between these views on the same pattern.
     </div>
   </section>
 
