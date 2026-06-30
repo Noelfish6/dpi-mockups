@@ -476,14 +476,14 @@
 
     <!-- =================== C · swim + time (step lane × time) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane · horizontal = Δt (dot at midpoint, label above) · 90° corner = lane change</span>
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · horizontal = Δt · 90° corner = lane change</span>
       <svg viewBox="0 0 1400 320" style="width: 100%; height: 320px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
           <circle cx="6" cy="6" r="5" fill="#9CA3AF"/><text x="16" y="9">one-off step</text>
           <circle cx="100" cy="6" r="5" fill="#06B6D4" stroke="#0891B2" stroke-width="1.5"/><text x="110" y="9" fill="#0E7490" font-weight="600">Refund req (loop)</text>
           <circle cx="240" cy="6" r="5" fill="#A855F7" stroke="#7E22CE" stroke-width="1.5"/><text x="250" y="9" fill="#6B21A8" font-weight="600">Pending (loop)</text>
-          <text x="380" y="9" fill="#6B7280" font-style="italic">every event lands on its step's row → loops are visits to the same lane, horizontal = elapsed time</text>
+          <text x="380" y="9" fill="#6B7280" font-style="italic">every event lands on its step's row → loops are visits to the same lane, edge slope shows direction</text>
         </g>
         <!-- Loop-lane background tints -->
         <rect x="158" y="105" width="1212" height="30" fill="#ECFEFF" opacity="0.5"/>
@@ -557,34 +557,34 @@
         <!-- 8→9: 60s wait on Pending lane, then drop to Info verify lane -->
         <line x1="760" y1="190" x2="1360" y2="190" stroke="#9CA3AF" stroke-width="1.8"/>
         <line x1="1360" y1="190" x2="1360" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-        <!-- Δt labels (above each event dot, color-coded when transitioning to a loop revisit) -->
+        <!-- Δt labels (centered above each horizontal segment) -->
         <g font-size="9" fill="#6B7280">
-          <text x="185"  y="72"  text-anchor="middle">5s</text>
-          <text x="225"  y="107" text-anchor="middle">3s</text>
-          <text x="250"  y="142" text-anchor="middle" fill="#0891B2" font-weight="600">2s</text>
-          <text x="285"  y="107" text-anchor="middle">5s</text>
-          <text x="385"  y="177" text-anchor="middle" fill="#0891B2" font-weight="600">15s</text>
-          <text x="485"  y="107" text-anchor="middle">5s</text>
-          <text x="635"  y="212" text-anchor="middle" fill="#7E22CE" font-weight="600">25s</text>
-          <text x="1060" y="177" text-anchor="middle" font-weight="600">60s wait</text>
+          <text x="185" y="80"  text-anchor="middle">5s</text>
+          <text x="225" y="115" text-anchor="middle">3s</text>
+          <text x="250" y="150" text-anchor="middle" fill="#0891B2" font-weight="600">2s</text>
+          <text x="285" y="115" text-anchor="middle">5s</text>
+          <text x="385" y="185" text-anchor="middle" fill="#0891B2" font-weight="600">15s</text>
+          <text x="485" y="115" text-anchor="middle">5s</text>
+          <text x="635" y="220" text-anchor="middle" fill="#7E22CE" font-weight="600">25s</text>
+          <text x="1060" y="185" text-anchor="middle" font-weight="600">60s wait</text>
         </g>
-        <!-- Nodes (each placed at the midpoint of its outgoing horizontal segment; node 9 has no outgoing segment, sits at its arrival position) -->
+        <!-- Nodes -->
         <g>
-          <g><circle cx="185"  cy="85"  r="11" fill="#9CA3AF"/><text x="185"  y="89"  text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
-          <g><circle cx="225"  cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="225"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
-          <g><circle cx="250"  cy="155" r="11" fill="#9CA3AF"/><text x="250"  y="159" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
-          <g><circle cx="285"  cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="285"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
-          <g><circle cx="385"  cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="385"  y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
-          <g><circle cx="485"  cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="485"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
-          <g><circle cx="635"  cy="225" r="11" fill="#9CA3AF"/><text x="635"  y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
-          <g><circle cx="1060" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="1060" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
+          <g><circle cx="160" cy="85" r="11" fill="#9CA3AF"/><text x="160" y="89" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text></g>
+          <g><circle cx="210" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="210" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text></g>
+          <g><circle cx="240" cy="155" r="11" fill="#9CA3AF"/><text x="240" y="159" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text></g>
+          <g><circle cx="260" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="260" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text></g>
+          <g><circle cx="310" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="310" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text></g>
+          <g><circle cx="460" cy="120" r="11" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="460" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text></g>
+          <g><circle cx="510" cy="225" r="11" fill="#9CA3AF"/><text x="510" y="229" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text></g>
+          <g><circle cx="760" cy="190" r="11" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="760" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text></g>
           <g><circle cx="1360" cy="260" r="11" fill="#9CA3AF"/><text x="1360" y="264" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text></g>
         </g>
       </svg>
       <div class="tradeoff">
         <p class="pro"><strong>Same step = same lane, perfectly aligned</strong> — Refund req (2, 4, 6) share one horizontal lane; Pending (5, 8) share another. The swimlane property is fully preserved, just rotated 90° from the original column layout.</p>
         <p class="pro"><strong>x = cumulative time, no compromises</strong> — every node's x position is its real timestamp; horizontal distance between any two nodes is their actual Δt.</p>
-        <p class="pro"><strong>Event dot + Δt label paired on the time-segment</strong> — each dot sits at the midpoint of its outgoing horizontal segment with the Δt label stacked directly above, so event and elapsed time read as one visual unit. The solid horizontal is the time (color-coded cyan/purple when the next step is a loop revisit); the dashed vertical at the segment's end is just a lane-change connector with no time meaning.</p>
+        <p class="pro"><strong>Horizontal = time, 90° corner = lane change</strong> — the solid horizontal segment's length equals Δt (color-coded cyan/purple when the next step is a loop-revisit); the dashed vertical drop is just a connector with no time meaning. Loop-backs read as an upward dashed jump at the next event's x-position.</p>
         <p class="con"><strong>Vertical real estate scales with unique step count</strong> — 6 steps → 6 lanes here. Patterns with 10+ unique steps need a taller chart or a scrollable y-axis.</p>
         <p class="con"><strong>Heavy-tail Δt still blows up width</strong> — the 60s gap dominates the right half of the viewBox; same log-scale or clipping consideration as Distance.</p>
       </div>
