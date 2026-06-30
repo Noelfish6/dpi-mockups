@@ -364,14 +364,28 @@
         <text x="245" y="38" text-anchor="middle" fill="#0891B2" font-size="9.5" font-weight="600">↻ × 3</text>
         <text x="505" y="38" text-anchor="middle" fill="#7E22CE" font-size="9.5" font-weight="600">↻ × 2</text>
         <line x1="40" y1="46" x2="830" y2="46" stroke="#E5E7EB"/>
-        <!-- edges (stroke-width = sqrt-ish scaled Δt) -->
+        <!-- edges: H carries Δt via stroke-width (thickness encoding); V is just a lane-change connector — weakened to dashed light grey, no thickness encoding -->
+        <!-- 1→2: 5s, same row -->
         <path d="M 127 75 H 233" fill="none" stroke="#9CA3AF" stroke-width="3"/>
+        <!-- 2→3: 3s, same row -->
         <path d="M 257 75 H 363" fill="none" stroke="#9CA3AF" stroke-width="2.5"/>
-        <path d="M 375 87 V 100 H 245 V 113" fill="none" stroke="#06B6D4" stroke-width="2"/>
+        <!-- 3→4: 2s, loop-back (col 3 → col 2, row 1 → row 2) -->
+        <line x1="375" y1="87"  x2="375" y2="100" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <line x1="375" y1="100" x2="245" y2="100" stroke="#06B6D4" stroke-width="2"/>
+        <line x1="245" y1="100" x2="245" y2="113" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 4→5: 5s, same row -->
         <path d="M 257 125 H 493" fill="none" stroke="#9CA3AF" stroke-width="3"/>
-        <path d="M 505 137 V 150 H 245 V 163" fill="none" stroke="#06B6D4" stroke-width="4"/>
+        <!-- 5→6: 15s, loop-back (col 4 → col 2, row 2 → row 3) -->
+        <line x1="505" y1="137" x2="505" y2="150" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <line x1="505" y1="150" x2="245" y2="150" stroke="#06B6D4" stroke-width="4"/>
+        <line x1="245" y1="150" x2="245" y2="163" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 6→7: 5s, same row -->
         <path d="M 257 175 H 623" fill="none" stroke="#9CA3AF" stroke-width="3"/>
-        <path d="M 635 187 V 200 H 505 V 213" fill="none" stroke="#A855F7" stroke-width="5"/>
+        <!-- 7→8: 25s, loop-back (col 5 → col 4, row 3 → row 4) -->
+        <line x1="635" y1="187" x2="635" y2="200" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <line x1="635" y1="200" x2="505" y2="200" stroke="#A855F7" stroke-width="5"/>
+        <line x1="505" y1="200" x2="505" y2="213" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
+        <!-- 8→9: 60s, same row -->
         <path d="M 517 225 H 753" fill="none" stroke="#9CA3AF" stroke-width="7"/>
         <!-- inline Δt labels -->
         <g font-size="9" fill="#6B7280">
