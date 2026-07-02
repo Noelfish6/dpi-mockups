@@ -534,14 +534,14 @@
         <!-- Loop count badges next to loop-step labels -->
         <text x="148" y="138" text-anchor="end" font-size="9" fill="#0891B2" font-weight="600">× 3</text>
         <text x="148" y="208" text-anchor="end" font-size="9" fill="#7E22CE" font-weight="600">× 2</text>
-        <!-- filter_by pill (illustrative: constrain Δt between Refund req and Pending). Pill sits in the gutter to the LEFT; a horizontal stub links it to a `[` bracket at the y-axis that opens RIGHT into the chart, enclosing Refund and Pending lanes. -->
+        <!-- filter_by pill (illustrative: constrain Δt between Refund req and Pending). Pill parked in the empty band above the chart (between legend and chart-top), a dashed connector routes down-and-in to a solid `[` bracket at the y-axis edge that opens RIGHT into the chart. -->
         <g>
-          <rect x="4" y="132" width="110" height="16" rx="8" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="1"/>
-          <text x="59" y="143" text-anchor="middle" fill="#075985" font-size="9" font-weight="600">filter_by · Δt &lt; 15s</text>
-          <line x1="114" y1="140" x2="160" y2="140" stroke="#0EA5E9" stroke-width="1"/>
-          <path d="M 160 120 V 190" fill="none" stroke="#0EA5E9" stroke-width="1.5"/>
-          <line x1="160" y1="120" x2="172" y2="120" stroke="#0EA5E9" stroke-width="1"/>
-          <line x1="160" y1="190" x2="172" y2="190" stroke="#0EA5E9" stroke-width="1"/>
+          <rect x="4" y="51" width="110" height="16" rx="8" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="1"/>
+          <text x="59" y="62" text-anchor="middle" fill="#075985" font-size="9" font-weight="600">filter_by · Δt &lt; 15s</text>
+          <path d="M 114 59 H 158 V 120" fill="none" stroke="#0EA5E9" stroke-width="1" stroke-dasharray="3,2"/>
+          <path d="M 158 120 V 190" fill="none" stroke="#0EA5E9" stroke-width="1.5"/>
+          <line x1="158" y1="120" x2="170" y2="120" stroke="#0EA5E9" stroke-width="1.5"/>
+          <line x1="158" y1="190" x2="170" y2="190" stroke="#0EA5E9" stroke-width="1.5"/>
         </g>
         <!-- Time axis (bottom) -->
         <line x1="160" y1="290" x2="1360" y2="290" stroke="#D1D5DB" stroke-width="1"/>
