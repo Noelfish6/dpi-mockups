@@ -492,7 +492,7 @@
 
     <!-- =================== C · swim + time (step lane × time) =================== -->
     <div class="render-block">
-      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · horizontal = Δt on a lane (color = lane) · 90° corner = lane change</span>
+      <span class="render-label label-c">C · swim + time</span><span class="render-sub">y = step lane (labeled) · x = cumulative time (10 px / sec) · horizontal = Δt on a lane (color = lane) · 90° corner = lane change · filter_by pill hangs above the label column with a bracket down to the constrained lanes</span>
       <svg viewBox="0 0 1400 320" style="width: 100%; height: 320px;">
         <!-- Legend -->
         <g transform="translate(40, 14)" font-size="10" fill="#374151">
@@ -534,6 +534,14 @@
         <!-- Loop count badges next to loop-step labels -->
         <text x="148" y="138" text-anchor="end" font-size="9" fill="#0891B2" font-weight="600">× 3</text>
         <text x="148" y="208" text-anchor="end" font-size="9" fill="#7E22CE" font-weight="600">× 2</text>
+        <!-- filter_by pill (illustrative: constrain Δt between Refund req and Pending). Pill sits above the label column; a bracket drops down along the y-axis-label edge and ticks the two constrained lanes. -->
+        <g>
+          <rect x="42" y="30" width="110" height="16" rx="8" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="1"/>
+          <text x="97" y="41" text-anchor="middle" fill="#075985" font-size="9" font-weight="600">filter_by · Δt &lt; 15s</text>
+          <path d="M 42 46 V 194" fill="none" stroke="#0EA5E9" stroke-width="1"/>
+          <line x1="42" y1="124" x2="52" y2="124" stroke="#0EA5E9" stroke-width="1"/>
+          <line x1="42" y1="194" x2="52" y2="194" stroke="#0EA5E9" stroke-width="1"/>
+        </g>
         <!-- Time axis (bottom) -->
         <line x1="160" y1="290" x2="1360" y2="290" stroke="#D1D5DB" stroke-width="1"/>
         <g font-size="9" fill="#6B7280">
