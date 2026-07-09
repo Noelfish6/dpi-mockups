@@ -61,9 +61,9 @@
   .viz-wrapper:has(.lanes-toggle:checked) .node-label { opacity: 0; }
   /* Mode-specific chrome (Δt labels, filter-by pills, edges) — orthogonal axes */
   .viz-wrapper .mode-even { opacity: 1; transition: opacity 0.15s ease 0.3s; }
-  .viz-wrapper:has(.time-toggle:checked) .mode-even { opacity: 0; transition: opacity 0.15s ease; }
-  .viz-wrapper .mode-time { opacity: 0; transition: opacity 0.15s ease; }
-  .viz-wrapper:has(.time-toggle:checked) .mode-time { opacity: 1; transition: opacity 0.15s ease 0.3s; }
+  .viz-wrapper:has(.time-toggle:checked) .mode-even { opacity: 0; transition: opacity 0.15s ease; pointer-events: none; }
+  .viz-wrapper .mode-time { opacity: 0; transition: opacity 0.15s ease; pointer-events: none; }
+  .viz-wrapper:has(.time-toggle:checked) .mode-time { opacity: 1; transition: opacity 0.15s ease 0.3s; pointer-events: auto; }
   .viz-wrapper .mode-seq   { opacity: 1; transition: opacity 0.2s ease 0.3s; }
   .viz-wrapper:has(.lanes-toggle:checked) .mode-seq   { opacity: 0; transition: opacity 0.2s ease; }
   .viz-wrapper .mode-lanes { opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
@@ -105,6 +105,13 @@
   .viz-wrapper .context-chip .context-expansion { opacity: 0; pointer-events: none; transition: opacity 0.18s ease; }
   .viz-wrapper .context-chip:hover .context-chip-body { opacity: 0; }
   .viz-wrapper .context-chip:hover .context-expansion { opacity: 1; }
+  /* Per-path row hover — reveals full event sequence tooltip below the row */
+  .viz-wrapper .path-row { cursor: help; }
+  .viz-wrapper .path-row .path-tooltip { opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
+  .viz-wrapper .path-row:hover .path-tooltip { opacity: 1; }
+  /* Sub-paths block visibility — hidden by default; shown only when paths-toggle is checked AND Show Δt is off */
+  .viz-wrapper .paths-block { opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
+  .viz-wrapper:has(.paths-toggle:checked):not(:has(.time-toggle:checked)) .paths-block { opacity: 1; pointer-events: auto; }
 </style>
 
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111827; padding: 24px; max-width: 1180px; margin: 0 auto;">
@@ -153,6 +160,7 @@
         <div class="viz-toggles">
           <label class="time-toggle-label"><input type="checkbox" class="time-toggle"> Show Δt</label>
           <label class="time-toggle-label"><input type="checkbox" class="lanes-toggle"> Show step lanes</label>
+          <label class="time-toggle-label"><input type="checkbox" class="paths-toggle"> Show sub-paths</label>
         </div>
       </div>
       <!-- Real pattern: fcr_premature_resolution_auto_reset · AskBo(< 5 min re-contact) · from airasia_agent_0620.json -->
@@ -206,21 +214,21 @@
 
           <!-- LANES + EVEN-X edges (nodes at even x: 280, 577, 874, 1171) -->
           <g class="mode-even">
-            <line x1="280"  y1="100" x2="577"  y2="100" stroke="#F59E0B" stroke-width="2"/>
+            <line x1="280"  y1="100" x2="577"  y2="100" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="577"  y1="100" x2="577"  y2="140" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="577"  y1="140" x2="874"  y2="140" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="577"  y1="140" x2="874"  y2="140" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="874"  y1="140" x2="874"  y2="180" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="874"  y1="180" x2="1171" y2="180" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="874"  y1="180" x2="1171" y2="180" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1171" y1="180" x2="1171" y2="100" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
           </g>
 
           <!-- LANES + TIME-X edges (nodes at time positions 280, 379, 577, 1171; scale 3.3 px/s over 300s window) -->
           <g class="mode-time">
-            <line x1="280"  y1="100" x2="379"  y2="100" stroke="#F59E0B" stroke-width="2"/>
+            <line x1="280"  y1="100" x2="379"  y2="100" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="379"  y1="100" x2="379"  y2="140" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="379"  y1="140" x2="577"  y2="140" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="379"  y1="140" x2="577"  y2="140" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="577"  y1="140" x2="577"  y2="180" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="577"  y1="180" x2="1171" y2="180" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="577"  y1="180" x2="1171" y2="180" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1171" y1="180" x2="1171" y2="100" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
           </g>
 
@@ -350,6 +358,147 @@
               <text x="1252" y="124" text-anchor="middle" fill="#6B7280" font-size="10">then …</text>
             </g>
           </g>
+
+          <!-- ====== POTENTIAL-PATHS HOVER (Entry-paths style: S curves + dot markers) — prism data · AirAsia 2026-07-04 ====== -->
+          <!-- Visibility controlled by the "Show sub-paths" checkbox; also auto-hides when Show Δt is on. -->
+          <g class="paths-block">
+
+          <!-- ---- Edge 1→2 (any_intent → Fully Resolved) · 1565 total · src x=293, tgt x=564, midpoint x=428.5 ---- -->
+          <!-- Direct (55×, 3.5%) reuses main timeline. Row hover reveals full event sequence via dark tooltip. -->
+          <g class="context-chip">
+            <rect x="290" y="6" width="277" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="406" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="429" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="290" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 path types · 1,565 total · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 293 120 C 374 7, 483 7, 564 120"/>
+                <path d="M 293 120 C 374 60, 483 60, 564 120"/>
+              </g>
+              <g stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="428.5" cy="35" r="7" fill="#F9FAFB"/>
+                <circle cx="428.5" cy="75" r="7" fill="#F9FAFB"/>
+                <circle cx="428.5" cy="120" r="7" fill="#fff"/>
+              </g>
+              <!-- Row 1: ping-pong dialogue (multi-turn btn↔ws) -->
+              <g class="path-row">
+                <rect x="435" y="30" width="130" height="12" fill="transparent"/>
+                <text x="440" y="38" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">32%</tspan> ping-pong dialogue</text>
+                <g class="path-tooltip">
+                  <rect x="294" y="41" width="200" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="300" y="49" font-size="7" fill="#F9FAFB">e.g. btn→ws→btn→ws→div→ws→btn→ws→div→ws</text>
+                </g>
+              </g>
+              <!-- Row 2: list drill-down (text→li→btn cycles) -->
+              <g class="path-row">
+                <rect x="435" y="70" width="130" height="12" fill="transparent"/>
+                <text x="440" y="78" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> list drill-down</text>
+                <g class="path-tooltip">
+                  <rect x="294" y="81" width="180" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="300" y="89" font-size="7" fill="#F9FAFB">e.g. text→li→btn→ws→text→li→btn→ws</text>
+                </g>
+              </g>
+              <!-- Row 3: direct (no intermediate events) — no tooltip -->
+              <text x="440" y="123" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">3.5%</tspan> direct (no clicks)</text>
+            </g>
+          </g>
+
+          <!-- ---- Edge 2→3 (Fully Resolved → Initial Greeting) · 995 total · src x=590, tgt x=861, midpoint x=725.5 ---- -->
+          <!-- Direct (45×, 4.5%) reuses main timeline. Top curve = 4.9%, bottom curve = 1.7%. -->
+          <g class="context-chip">
+            <rect x="587" y="6" width="277" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="703" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="726" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="587" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 path types · 995 total · illustrative</text>
+              <!-- 2 grey S curves + hollow-on-timeline for direct -->
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 590 120 C 671 7, 780 7, 861 120"/>
+                <path d="M 590 120 C 671 60, 780 60, 861 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="725.5" cy="35" r="7"/>
+                <circle cx="725.5" cy="75" r="7"/>
+              </g>
+              <!-- Direct marker on timeline: hollow ring, grey -->
+              <circle cx="725.5" cy="120" r="7" fill="#fff" stroke="#9CA3AF" stroke-width="1.5"/>
+              <!-- Row 1: app backgrounded → reload (webvitals sequence) -->
+              <g class="path-row">
+                <rect x="732" y="30" width="135" height="12" fill="transparent"/>
+                <text x="737" y="38" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">28%</tspan> background → reload</text>
+                <g class="path-tooltip">
+                  <rect x="591" y="41" width="195" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="597" y="49" font-size="7" fill="#F9FAFB">e.g. net→inp→cls→app_bg→pv→fcp→win_ld→ttfb</text>
+                </g>
+              </g>
+              <!-- Row 2: brief click before app reload -->
+              <g class="path-row">
+                <rect x="732" y="70" width="135" height="12" fill="transparent"/>
+                <text x="737" y="78" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">5%</tspan> brief click + reload</text>
+                <g class="path-tooltip">
+                  <rect x="591" y="81" width="115" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="597" y="89" font-size="7" fill="#F9FAFB">e.g. text→net→pv→lcp</text>
+                </g>
+              </g>
+              <!-- Row 3: 4.5% direct — no tooltip -->
+              <text x="737" y="123" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">4.5%</tspan> direct (instant)</text>
+            </g>
+          </g>
+
+          <!-- ---- Edge 3→4 (Initial Greeting → any_intent) · 7535 total · src x=887, tgt x=1158, midpoint x=1022.5 ---- -->
+          <!-- All 3 paths short (1-3 intermediate events) — no truncation, no tooltips needed. -->
+          <g class="context-chip">
+            <rect x="884" y="6" width="277" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="1000" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="1023" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="884" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 path types · 7,535 total · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 887 120 C 968 20, 1077 20, 1158 120"/>
+                <path d="M 887 120 C 968 50, 1077 50, 1158 120"/>
+                <path d="M 887 120 C 968 87, 1077 87, 1158 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="1022.5" cy="45" r="7"/>
+                <circle cx="1022.5" cy="68" r="7"/>
+                <circle cx="1022.5" cy="95" r="7"/>
+              </g>
+              <!-- Row 1: single click → new intent -->
+              <g class="path-row">
+                <rect x="1029" y="40" width="130" height="12" fill="transparent"/>
+                <text x="1034" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">30%</tspan> one-click new intent</text>
+                <g class="path-tooltip">
+                  <rect x="888" y="51" width="70" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="894" y="59" font-size="7" fill="#F9FAFB">e.g. div</text>
+                </g>
+              </g>
+              <!-- Row 2: click then continue -->
+              <g class="path-row">
+                <rect x="1029" y="63" width="130" height="12" fill="transparent"/>
+                <text x="1034" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">22%</tspan> click-then-continue</text>
+                <g class="path-tooltip">
+                  <rect x="888" y="74" width="105" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="894" y="82" font-size="7" fill="#F9FAFB">e.g. text→lcp→btn</text>
+                </g>
+              </g>
+              <!-- Row 3: multi-click sequence -->
+              <g class="path-row">
+                <rect x="1029" y="90" width="130" height="12" fill="transparent"/>
+                <text x="1034" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">11%</tspan> multi-click sequence</text>
+                <g class="path-tooltip">
+                  <rect x="888" y="101" width="95" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="894" y="109" font-size="7" fill="#F9FAFB">e.g. text→btn</text>
+                </g>
+              </g>
+            </g>
+          </g>
+          </g>
         </g>
 
         <!-- ==== ANIMATED NODES ==== -->
@@ -358,202 +507,6 @@
         <g class="node" style="--dx: -198px; --dy: 20px;"><circle class="node-circle" cx="577"  cy="120" r="13" fill="#9CA3AF"/><text x="577"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="577"  y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Fully Resolved</text></g>
         <g class="node" style="--dx: -297px; --dy: 60px;"><circle class="node-circle" cx="874"  cy="120" r="13" fill="#9CA3AF"/><text x="874"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="874"  y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Initial Greeting</text></g>
         <g class="node" style="--dx: 0px;    --dy: -20px;"><circle class="node-circle" cx="1171" cy="120" r="13" fill="#F59E0B" stroke="#D97706" stroke-width="2"/><text x="1171" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="1171" y="152" class="node-label" text-anchor="middle" fill="#B45309" font-size="10" font-weight="500">any_intent ↻</text></g>
-      </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       SUMMARY · Example B (illustrative 9-event refund/pending loop)
-       ============================================================ -->
-  <section class="case-block" style="margin-top: 24px;">
-    <div style="font-size: 12px; color: #6B7280; margin: 0 0 12px;"><strong style="color: #374151;">Example B</strong> · Refund ↔ Pending loop · illustrative 9-event trace with two repeating step types &amp; a Δt filter by (retained for comparison)</div>
-    <div class="render-block viz-wrapper viz-b">
-      <div class="viz-header">
-        <h3 style="font-size: 13px; font-weight: 600; color: #374151;">Step sequence</h3>
-        <div class="viz-toggles">
-          <label class="time-toggle-label"><input type="checkbox" class="time-toggle"> Show Δt</label>
-          <label class="time-toggle-label"><input type="checkbox" class="lanes-toggle"> Show step lanes</label>
-        </div>
-      </div>
-      <div class="viz-svg-wrap">
-      <svg viewBox="0 0 1400 325">
-        <!-- ==== LANES-MODE CHROME (background tints, y-labels, gridlines, badges, time axis) ==== -->
-        <g class="mode-lanes">
-          <!-- Loop-lane background tints (Refund req cyan, Pending purple) -->
-          <rect x="288" y="105" width="1082" height="30" fill="#ECFEFF" opacity="0.5"/>
-          <rect x="288" y="175" width="1082" height="30" fill="#F5F3FF" opacity="0.5"/>
-          <!-- Row guidelines -->
-          <g stroke="#F3F4F6" stroke-width="1">
-            <line x1="290" y1="85"  x2="1370" y2="85"/>
-            <line x1="290" y1="120" x2="1370" y2="120"/>
-            <line x1="290" y1="155" x2="1370" y2="155"/>
-            <line x1="290" y1="190" x2="1370" y2="190"/>
-            <line x1="290" y1="225" x2="1370" y2="225"/>
-            <line x1="290" y1="260" x2="1370" y2="260"/>
-          </g>
-          <!-- Y-axis: step labels -->
-          <g font-size="10.5" fill="#374151">
-            <text x="267" y="89"  text-anchor="end">Greeting</text>
-            <text x="267" y="124" text-anchor="end" fill="#0E7490" font-weight="600">Refund request</text>
-            <text x="267" y="159" text-anchor="end">Session restart</text>
-            <text x="267" y="194" text-anchor="end" fill="#6B21A8" font-weight="600">Pending action</text>
-            <text x="267" y="229" text-anchor="end">Process initiated</text>
-            <text x="267" y="264" text-anchor="end">Info verify</text>
-          </g>
-          <!-- Loop count badges next to loop-step labels -->
-          <text x="263" y="138" text-anchor="end" font-size="9" fill="#0891B2" font-weight="600">× 3</text>
-          <text x="263" y="208" text-anchor="end" font-size="9" fill="#7E22CE" font-weight="600">× 2</text>
-
-          <!-- Time-mode-only: vertical time gridlines + time axis (only meaningful when x is time-proportional) -->
-          <g class="mode-time">
-            <g stroke="#F3F4F6" stroke-width="1">
-              <line x1="560"  y1="70" x2="560"  y2="278"/>
-              <line x1="830"  y1="70" x2="830"  y2="278"/>
-              <line x1="1100" y1="70" x2="1100" y2="278"/>
-            </g>
-            <line x1="290" y1="285" x2="1370" y2="285" stroke="#D1D5DB" stroke-width="1"/>
-            <g font-size="9" fill="#6B7280">
-              <line x1="290"  y1="285" x2="290"  y2="289" stroke="#9CA3AF"/>
-              <line x1="560"  y1="285" x2="560"  y2="289" stroke="#9CA3AF"/>
-              <line x1="830"  y1="285" x2="830"  y2="289" stroke="#9CA3AF"/>
-              <line x1="1100" y1="285" x2="1100" y2="289" stroke="#9CA3AF"/>
-              <line x1="1370" y1="285" x2="1370" y2="289" stroke="#9CA3AF"/>
-              <text x="290"  y="295" text-anchor="middle">0s</text>
-              <text x="560"  y="295" text-anchor="middle">30s</text>
-              <text x="830"  y="295" text-anchor="middle">60s</text>
-              <text x="1100" y="295" text-anchor="middle">90s</text>
-              <text x="1370" y="295" text-anchor="middle">120s</text>
-            </g>
-          </g>
-
-          <!-- LANES + EVEN-X edges (nodes at even x positions: 290, 425, 560, 695, 830, 965, 1100, 1235, 1370) -->
-          <g class="mode-even">
-            <!-- 1→2 Greeting→Refund req grey -->
-            <line x1="290"  y1="85"  x2="425"  y2="85"  stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="425"  y1="85"  x2="425"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 2→3 Refund req→Restart cyan -->
-            <line x1="425"  y1="120" x2="560"  y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="560"  y1="120" x2="560"  y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 3→4 Restart→Refund req↻ grey -->
-            <line x1="560"  y1="155" x2="695"  y2="155" stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="695"  y1="155" x2="695"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 4→5 Refund req↻→Pending cyan -->
-            <line x1="695"  y1="120" x2="830"  y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="830"  y1="120" x2="830"  y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 5→6 Pending→Refund req↻ purple -->
-            <line x1="830"  y1="190" x2="965"  y2="190" stroke="#A855F7" stroke-width="2"/>
-            <line x1="965"  y1="190" x2="965"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 6→7 Refund req↻→Process init cyan -->
-            <line x1="965"  y1="120" x2="1100" y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="1100" y1="120" x2="1100" y2="225" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 7→8 Process init→Pending↻ grey -->
-            <line x1="1100" y1="225" x2="1235" y2="225" stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="1235" y1="225" x2="1235" y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 8→9 Pending↻→Info verify purple -->
-            <line x1="1235" y1="190" x2="1370" y2="190" stroke="#A855F7" stroke-width="2"/>
-            <line x1="1370" y1="190" x2="1370" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-          </g>
-
-          <!-- LANES + TIME-X edges (nodes at strict 9 px/s time positions: 290, 335, 362, 380, 425, 560, 605, 830, 1370) -->
-          <g class="mode-time">
-            <line x1="290" y1="85"  x2="335" y2="85"  stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="335" y1="85"  x2="335" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="335" y1="120" x2="362" y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="362" y1="120" x2="362" y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="362" y1="155" x2="380" y2="155" stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="380" y1="155" x2="380" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="380" y1="120" x2="425" y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="425" y1="120" x2="425" y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="425" y1="190" x2="560" y2="190" stroke="#A855F7" stroke-width="2"/>
-            <line x1="560" y1="190" x2="560" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="560" y1="120" x2="605" y2="120" stroke="#06B6D4" stroke-width="2"/>
-            <line x1="605" y1="120" x2="605" y2="225" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="605" y1="225" x2="830" y2="225" stroke="#9CA3AF" stroke-width="1.8"/>
-            <line x1="830" y1="225" x2="830" y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="830" y1="190" x2="1370" y2="190" stroke="#A855F7" stroke-width="2"/>
-            <line x1="1370" y1="190" x2="1370" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-          </g>
-
-          <!-- LANES-mode Δt labels (per-edge midpoints on the source lane) -->
-          <g class="mode-even">
-            <g font-size="9" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">
-              <text x="358"  y="80"  fill="#6B7280">5s</text>
-              <text x="493"  y="115" fill="#0E7490" font-weight="600">3s</text>
-              <text x="628"  y="150" fill="#6B7280">2s</text>
-              <text x="763"  y="115" fill="#0E7490" font-weight="600">5s</text>
-              <text x="898"  y="185" fill="#6B21A8" font-weight="600">15s</text>
-              <text x="1033" y="115" fill="#0E7490" font-weight="600">5s</text>
-              <text x="1168" y="220" fill="#6B7280">25s</text>
-              <text x="1303" y="185" fill="#6B21A8" font-weight="600">60s</text>
-            </g>
-          </g>
-          <g class="mode-time">
-            <g font-size="9" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">
-              <text x="313"  y="80"  fill="#6B7280">5s</text>
-              <text x="349"  y="115" fill="#0E7490" font-weight="600">3s</text>
-              <text x="371"  y="150" fill="#6B7280">2s</text>
-              <text x="403"  y="115" fill="#0E7490" font-weight="600">5s</text>
-              <text x="493"  y="185" fill="#6B21A8" font-weight="600">15s</text>
-              <text x="583"  y="115" fill="#0E7490" font-weight="600">5s</text>
-              <text x="718"  y="220" fill="#6B7280">25s</text>
-              <text x="1100" y="185" fill="#6B21A8" font-weight="600">60s</text>
-            </g>
-          </g>
-
-          <!-- LANES-mode filter-by pill: Δt(5-4), Δt(6-5) < 15s. Bracket-less; pill spans Step 4 → Step 6 circle centers. Below x-axis labels (y=295). -->
-          <g class="anim-pill" style="--xe: 695; --we: 270; --xt: 380; --wt: 180;">
-            <clipPath id="fp-clip-b-lanes"><rect class="ap-bg" x="695" y="307" width="270" height="16" rx="8"/></clipPath>
-            <g clip-path="url(#fp-clip-b-lanes)">
-              <rect class="ap-dark" x="695" y="307" width="55" height="16" fill="#BAE6FD"/>
-              <rect class="ap-light" x="750" y="307" width="215" height="16" fill="#F0F9FF"/>
-            </g>
-            <text class="ap-label" x="722.5" y="318" text-anchor="middle" fill="#0C4A6E" font-size="9" font-weight="600">filter by</text>
-            <text class="ap-value" x="857.5" y="318" text-anchor="middle" fill="#075985" font-size="9" font-weight="700">Δt(5−4), Δt(6−5) &lt; 15s</text>
-          </g>
-        </g>
-
-        <!-- ==== SEQUENCE-MODE CHROME (below-timeline filter-by pill + single horizontal timeline + Δt labels) ==== -->
-        <g class="mode-seq">
-          <!-- Filter-by pill: bracket-less; pill spans Step 4 → Step 6 circle centers. Just below node labels (labels end at y≈157). -->
-          <g class="anim-pill" style="--xe: 695; --we: 270; --xt: 469; --wt: 176;">
-            <clipPath id="fp-clip-b-seq"><rect class="ap-bg" x="695" y="168" width="270" height="16" rx="8"/></clipPath>
-            <g clip-path="url(#fp-clip-b-seq)">
-              <rect class="ap-dark" x="695" y="168" width="55" height="16" fill="#BAE6FD"/>
-              <rect class="ap-light" x="750" y="168" width="215" height="16" fill="#F0F9FF"/>
-            </g>
-            <text class="ap-label" x="722.5" y="179" text-anchor="middle" fill="#0C4A6E" font-size="9" font-weight="600">filter by</text>
-            <text class="ap-value" x="857.5" y="179" text-anchor="middle" fill="#075985" font-size="9" font-weight="700">Δt(5−4), Δt(6−5) &lt; 15s</text>
-          </g>
-
-          <line x1="270" y1="120" x2="1390" y2="120" stroke="#D1D5DB" stroke-width="2"/>
-
-          <!-- MODE-TIME: Δt labels above the timeline -->
-          <g class="mode-time">
-            <g font-size="9" fill="#6B7280" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">
-              <text x="320"  y="105">5s</text>
-              <text x="378"  y="105">3s</text>
-              <text x="438"  y="105">2s</text>
-              <text x="500"  y="105">5s</text>
-              <text x="588"  y="105" fill="#6B21A8" font-weight="600">15s</text>
-              <text x="683"  y="105">5s</text>
-              <text x="816"  y="105">25s</text>
-              <text x="1141" y="105" fill="#6B21A8" font-weight="600">60s</text>
-            </g>
-          </g>
-        </g>
-
-        <!-- ==== ANIMATED NODES ==== -->
-        <!-- Defaults: even x (290, 425, ..., 1370), single-row y=120. --dx → time x (compressed sequence scale, min-clamped for label readability). --dx-lanes → strict 9 px/s time x for lanes mode. --dy → lane y. -->
-        <g class="node" style="--dx: 0px;    --dx-lanes: 0px;    --dy: -35px;"><circle class="node-circle" cx="290"  cy="120" r="13" fill="#9CA3AF"/><text x="290"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">1</text><text x="290"  y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Greeting</text></g>
-        <g class="node" style="--dx: -75px;  --dx-lanes: -90px;  --dy: 0px;"><circle class="node-circle" cx="425"  cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="425"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">2</text><text x="425"  y="152" class="node-label" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req</text></g>
-        <g class="node" style="--dx: -153px; --dx-lanes: -198px; --dy: 35px;"><circle class="node-circle" cx="560"  cy="120" r="13" fill="#9CA3AF"/><text x="560"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">3</text><text x="560"  y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Restart</text></g>
-        <g class="node" style="--dx: -226px; --dx-lanes: -315px; --dy: 0px;"><circle class="node-circle" cx="695"  cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="695"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">4</text><text x="695"  y="152" class="node-label" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req ↻</text></g>
-        <g class="node" style="--dx: -299px; --dx-lanes: -405px; --dy: 70px;"><circle class="node-circle" cx="830"  cy="120" r="13" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="830"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">5</text><text x="830"  y="152" class="node-label" text-anchor="middle" fill="#6B21A8" font-size="10" font-weight="500">Pending</text></g>
-        <g class="node" style="--dx: -320px; --dx-lanes: -405px; --dy: 0px;"><circle class="node-circle" cx="965"  cy="120" r="13" fill="#06B6D4" stroke="#0891B2" stroke-width="2"/><text x="965"  y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">6</text><text x="965"  y="152" class="node-label" text-anchor="middle" fill="#0E7490" font-size="10" font-weight="500">Refund req ↻</text></g>
-        <g class="node" style="--dx: -379px; --dx-lanes: -495px; --dy: 105px;"><circle class="node-circle" cx="1100" cy="120" r="13" fill="#9CA3AF"/><text x="1100" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">7</text><text x="1100" y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Process init</text></g>
-        <g class="node" style="--dx: -323px; --dx-lanes: -405px; --dy: 70px;"><circle class="node-circle" cx="1235" cy="120" r="13" fill="#A855F7" stroke="#7E22CE" stroke-width="2"/><text x="1235" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">8</text><text x="1235" y="152" class="node-label" text-anchor="middle" fill="#6B21A8" font-size="10" font-weight="500">Pending ↻</text></g>
-        <g class="node" style="--dx: 0px;    --dx-lanes: 0px;    --dy: 140px;"><circle class="node-circle" cx="1370" cy="120" r="13" fill="#9CA3AF"/><text x="1370" y="124" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">9</text><text x="1370" y="152" class="node-label" text-anchor="middle" fill="#374151" font-size="10">Info verify</text></g>
       </svg>
       </div>
     </div>
@@ -590,6 +543,7 @@
         <div class="viz-toggles">
           <label class="time-toggle-label"><input type="checkbox" class="time-toggle"> Show Δt</label>
           <label class="time-toggle-label"><input type="checkbox" class="lanes-toggle"> Show step lanes</label>
+          <label class="time-toggle-label"><input type="checkbox" class="paths-toggle"> Show sub-paths</label>
         </div>
       </div>
       <div class="viz-legend" style="display: flex; flex-wrap: wrap; gap: 14px; padding: 4px 0 8px; font-size: 10.5px; color: #4B5563; line-height: 1.4;">
@@ -661,56 +615,56 @@
 
           <!-- LANES + EVEN-X edges (nodes at even x positions: 190, 310, 430, 550, 670, 790, 910, 1030, 1150, 1270) -->
           <g class="mode-even">
-            <!-- 1→2 SV(85)→FS(120) cyan -->
-            <line x1="190"  y1="85"  x2="310"  y2="85"  stroke="#06B6D4" stroke-width="2"/>
+            <!-- 1→2 SV(85)→FS(120) -->
+            <line x1="190"  y1="85"  x2="310"  y2="85"  stroke="#D1D5DB" stroke-width="2"/>
             <line x1="310"  y1="85"  x2="310"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 2→3 FS→CV purple -->
-            <line x1="310"  y1="120" x2="430"  y2="120" stroke="#A855F7" stroke-width="2"/>
+            <!-- 2→3 FS→CV -->
+            <line x1="310"  y1="120" x2="430"  y2="120" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="430"  y1="120" x2="430"  y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 3→4 CV→SV↻ amber + red loop-return -->
-            <line x1="430"  y1="155" x2="550"  y2="155" stroke="#F59E0B" stroke-width="2"/>
+            <!-- 3→4 CV→SV↻ + red loop-return -->
+            <line x1="430"  y1="155" x2="550"  y2="155" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="550"  y1="155" x2="550"  y2="85"  stroke="#DC2626" stroke-width="1.6" stroke-dasharray="3,2"/>
             <text x="555" y="120" font-size="9" fill="#B91C1C" font-weight="600">↻</text>
-            <!-- 4→5 SV↻→FS↻ cyan -->
-            <line x1="550"  y1="85"  x2="670"  y2="85"  stroke="#06B6D4" stroke-width="2"/>
+            <!-- 4→5 SV↻→FS↻ -->
+            <line x1="550"  y1="85"  x2="670"  y2="85"  stroke="#D1D5DB" stroke-width="2"/>
             <line x1="670"  y1="85"  x2="670"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 5→6 FS↻→CV↻ purple -->
-            <line x1="670"  y1="120" x2="790"  y2="120" stroke="#A855F7" stroke-width="2"/>
+            <!-- 5→6 FS↻→CV↻ -->
+            <line x1="670"  y1="120" x2="790"  y2="120" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="790"  y1="120" x2="790"  y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 6→7 CV↻→PV amber -->
-            <line x1="790"  y1="155" x2="910"  y2="155" stroke="#F59E0B" stroke-width="2"/>
+            <!-- 6→7 CV↻→PV -->
+            <line x1="790"  y1="155" x2="910"  y2="155" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="910"  y1="155" x2="910"  y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <!-- 7→8 PV→ERR grey + red drop -->
-            <line x1="910"  y1="190" x2="1030" y2="190" stroke="#9CA3AF" stroke-width="1.8"/>
+            <!-- 7→8 PV→ERR + red drop -->
+            <line x1="910"  y1="190" x2="1030" y2="190" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1030" y1="190" x2="1030" y2="225" stroke="#EF4444" stroke-width="1.6" stroke-dasharray="3,2"/>
-            <!-- 8→9 ERR→CC red -->
-            <line x1="1030" y1="225" x2="1150" y2="225" stroke="#EF4444" stroke-width="2"/>
+            <!-- 8→9 ERR→CC -->
+            <line x1="1030" y1="225" x2="1150" y2="225" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1150" y1="225" x2="1150" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
             <!-- 9→10 CC→PC grey -->
-            <line x1="1150" y1="260" x2="1270" y2="260" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="1150" y1="260" x2="1270" y2="260" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1270" y1="260" x2="1270" y2="295" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
           </g>
 
           <!-- LANES + TIME-X edges (nodes at time positions: 190, 268, 298, 478, 523, 553, 745, 992, 1199, 1269) -->
           <g class="mode-time">
-            <line x1="190"  y1="85"  x2="268"  y2="85"  stroke="#06B6D4" stroke-width="2"/>
+            <line x1="190"  y1="85"  x2="268"  y2="85"  stroke="#D1D5DB" stroke-width="2"/>
             <line x1="268"  y1="85"  x2="268"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="268"  y1="120" x2="298"  y2="120" stroke="#A855F7" stroke-width="2"/>
+            <line x1="268"  y1="120" x2="298"  y2="120" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="298"  y1="120" x2="298"  y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="298"  y1="155" x2="478"  y2="155" stroke="#F59E0B" stroke-width="2"/>
+            <line x1="298"  y1="155" x2="478"  y2="155" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="478"  y1="155" x2="478"  y2="85"  stroke="#DC2626" stroke-width="1.6" stroke-dasharray="3,2"/>
             <text x="483" y="120" font-size="9" fill="#B91C1C" font-weight="600">↻</text>
-            <line x1="478"  y1="85"  x2="523"  y2="85"  stroke="#06B6D4" stroke-width="2"/>
+            <line x1="478"  y1="85"  x2="523"  y2="85"  stroke="#D1D5DB" stroke-width="2"/>
             <line x1="523"  y1="85"  x2="523"  y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="523"  y1="120" x2="553"  y2="120" stroke="#A855F7" stroke-width="2"/>
+            <line x1="523"  y1="120" x2="553"  y2="120" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="553"  y1="120" x2="553"  y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="553"  y1="155" x2="745"  y2="155" stroke="#F59E0B" stroke-width="2"/>
+            <line x1="553"  y1="155" x2="745"  y2="155" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="745"  y1="155" x2="745"  y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="745"  y1="190" x2="992"  y2="190" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="745"  y1="190" x2="992"  y2="190" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="992"  y1="190" x2="992"  y2="225" stroke="#EF4444" stroke-width="1.6" stroke-dasharray="3,2"/>
-            <line x1="992"  y1="225" x2="1199" y2="225" stroke="#EF4444" stroke-width="2"/>
+            <line x1="992"  y1="225" x2="1199" y2="225" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1199" y1="225" x2="1199" y2="260" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
-            <line x1="1199" y1="260" x2="1269" y2="260" stroke="#9CA3AF" stroke-width="1.8"/>
+            <line x1="1199" y1="260" x2="1269" y2="260" stroke="#D1D5DB" stroke-width="2"/>
             <line x1="1269" y1="260" x2="1269" y2="295" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
           </g>
 
@@ -813,6 +767,427 @@
               <rect x="1287" y="110" width="55" height="20" rx="10" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="3,2"/>
               <text x="1314" y="124" text-anchor="middle" fill="#6B7280" font-size="10">then …</text>
             </g>
+          </g>
+
+          <!-- ====== POTENTIAL-PATHS HOVER · Example C · 9 edges · all W=94 (120px node spacing) ====== -->
+          <!-- Hand-illustrative sub-paths. Visibility controlled by "Show sub-paths" checkbox; also hides when Show Δt is on. -->
+          <!-- Labels overflow into adjacent edges (only one chip expands per hover). -->
+          <g class="paths-block">
+
+          <!-- Edge 1→2 (SV→FS) · 220 · src=203 tgt=297 mid=250 -->
+          <g class="context-chip">
+            <rect x="200" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="227" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="250" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="200" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 220 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 203 120 C 231 20, 269 20, 297 120"/>
+                <path d="M 203 120 C 231 50, 269 50, 297 120"/>
+                <path d="M 203 120 C 231 87, 269 87, 297 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="250" cy="45" r="7"/>
+                <circle cx="250" cy="68" r="7"/>
+                <circle cx="250" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="257" y="40" width="100" height="12" fill="transparent"/>
+                <text x="262" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">55%</tspan> quick pick</text>
+                <g class="path-tooltip">
+                  <rect x="204" y="51" width="115" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="210" y="59" font-size="7" fill="#F9FAFB">e.g. pv→text→li→net</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="257" y="63" width="100" height="12" fill="transparent"/>
+                <text x="262" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">30%</tspan> scroll &amp; compare</text>
+                <g class="path-tooltip">
+                  <rect x="204" y="74" width="145" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="210" y="82" font-size="7" fill="#F9FAFB">e.g. pv→net→net→net→li→net</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="257" y="90" width="100" height="12" fill="transparent"/>
+                <text x="262" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> filter refine</text>
+                <g class="path-tooltip">
+                  <rect x="204" y="101" width="120" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="210" y="109" font-size="7" fill="#F9FAFB">e.g. btn→li→li→net</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 2→3 (FS→CV) · 210 · src=323 tgt=417 mid=370 -->
+          <g class="context-chip">
+            <rect x="320" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="347" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="370" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="320" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 210 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 323 120 C 351 20, 389 20, 417 120"/>
+                <path d="M 323 120 C 351 50, 389 50, 417 120"/>
+                <path d="M 323 120 C 351 87, 389 87, 417 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="370" cy="45" r="7"/>
+                <circle cx="370" cy="68" r="7"/>
+                <circle cx="370" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="377" y="40" width="100" height="12" fill="transparent"/>
+                <text x="382" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">60%</tspan> direct add</text>
+                <g class="path-tooltip">
+                  <rect x="324" y="51" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="330" y="59" font-size="7" fill="#F9FAFB">e.g. text→btn→net</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="377" y="63" width="100" height="12" fill="transparent"/>
+                <text x="382" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">25%</tspan> seat first</text>
+                <g class="path-tooltip">
+                  <rect x="324" y="74" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="330" y="82" font-size="7" fill="#F9FAFB">e.g. text→li→btn</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="377" y="90" width="100" height="12" fill="transparent"/>
+                <text x="382" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> price detail</text>
+                <g class="path-tooltip">
+                  <rect x="324" y="101" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="330" y="109" font-size="7" fill="#F9FAFB">e.g. text→li→text</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 3→4 (CV→SV↻) · 155 · src=443 tgt=537 mid=490 · loop-back -->
+          <g class="context-chip">
+            <rect x="440" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="467" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="490" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="440" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 155 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 443 120 C 471 20, 509 20, 537 120"/>
+                <path d="M 443 120 C 471 50, 509 50, 537 120"/>
+                <path d="M 443 120 C 471 87, 509 87, 537 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="490" cy="45" r="7"/>
+                <circle cx="490" cy="68" r="7"/>
+                <circle cx="490" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="497" y="40" width="105" height="12" fill="transparent"/>
+                <text x="502" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">45%</tspan> price hesitation</text>
+                <g class="path-tooltip">
+                  <rect x="444" y="51" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="450" y="59" font-size="7" fill="#F9FAFB">e.g. btn→pv</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="497" y="63" width="105" height="12" fill="transparent"/>
+                <text x="502" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">30%</tspan> date change</text>
+                <g class="path-tooltip">
+                  <rect x="444" y="74" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="450" y="82" font-size="7" fill="#F9FAFB">e.g. btn→li→net</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="497" y="90" width="105" height="12" fill="transparent"/>
+                <text x="502" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">25%</tspan> route swap</text>
+                <g class="path-tooltip">
+                  <rect x="444" y="101" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="450" y="109" font-size="7" fill="#F9FAFB">e.g. btn→li</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 4→5 (SV↻→FS↻) · 155 · src=563 tgt=657 mid=610 -->
+          <g class="context-chip">
+            <rect x="560" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="587" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="610" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="560" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 155 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 563 120 C 591 20, 629 20, 657 120"/>
+                <path d="M 563 120 C 591 50, 629 50, 657 120"/>
+                <path d="M 563 120 C 591 87, 629 87, 657 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="610" cy="45" r="7"/>
+                <circle cx="610" cy="68" r="7"/>
+                <circle cx="610" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="617" y="40" width="100" height="12" fill="transparent"/>
+                <text x="622" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">50%</tspan> same flight</text>
+                <g class="path-tooltip">
+                  <rect x="564" y="51" width="75" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="570" y="59" font-size="7" fill="#F9FAFB">e.g. text→li</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="617" y="63" width="100" height="12" fill="transparent"/>
+                <text x="622" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">35%</tspan> alt flight</text>
+                <g class="path-tooltip">
+                  <rect x="564" y="74" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="570" y="82" font-size="7" fill="#F9FAFB">e.g. text→net→li</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="617" y="90" width="100" height="12" fill="transparent"/>
+                <text x="622" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> alt time</text>
+                <g class="path-tooltip">
+                  <rect x="564" y="101" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="570" y="109" font-size="7" fill="#F9FAFB">e.g. li→net</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 5→6 (FS↻→CV↻) · 145 · src=683 tgt=777 mid=730 -->
+          <g class="context-chip">
+            <rect x="680" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="707" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="730" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="680" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 145 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 683 120 C 711 20, 749 20, 777 120"/>
+                <path d="M 683 120 C 711 50, 749 50, 777 120"/>
+                <path d="M 683 120 C 711 87, 749 87, 777 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="730" cy="45" r="7"/>
+                <circle cx="730" cy="68" r="7"/>
+                <circle cx="730" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="737" y="40" width="100" height="12" fill="transparent"/>
+                <text x="742" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">65%</tspan> direct add</text>
+                <g class="path-tooltip">
+                  <rect x="684" y="51" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="690" y="59" font-size="7" fill="#F9FAFB">e.g. text→btn</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="737" y="63" width="100" height="12" fill="transparent"/>
+                <text x="742" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">20%</tspan> seat adjust</text>
+                <g class="path-tooltip">
+                  <rect x="684" y="74" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="690" y="82" font-size="7" fill="#F9FAFB">e.g. btn→text→btn</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="737" y="90" width="100" height="12" fill="transparent"/>
+                <text x="742" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> re-verify</text>
+                <g class="path-tooltip">
+                  <rect x="684" y="101" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="690" y="109" font-size="7" fill="#F9FAFB">e.g. li→text</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 6→7 (CV↻→PV) · 135 · src=803 tgt=897 mid=850 -->
+          <g class="context-chip">
+            <rect x="800" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="827" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="850" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="800" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 135 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 803 120 C 831 20, 869 20, 897 120"/>
+                <path d="M 803 120 C 831 50, 869 50, 897 120"/>
+                <path d="M 803 120 C 831 87, 869 87, 897 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="850" cy="45" r="7"/>
+                <circle cx="850" cy="68" r="7"/>
+                <circle cx="850" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="857" y="40" width="100" height="12" fill="transparent"/>
+                <text x="862" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">70%</tspan> direct</text>
+                <g class="path-tooltip">
+                  <rect x="804" y="51" width="95" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="810" y="59" font-size="7" fill="#F9FAFB">e.g. btn→net→pv</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="857" y="63" width="100" height="12" fill="transparent"/>
+                <text x="862" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">20%</tspan> terms review</text>
+                <g class="path-tooltip">
+                  <rect x="804" y="74" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="810" y="82" font-size="7" fill="#F9FAFB">e.g. text→li</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="857" y="90" width="100" height="12" fill="transparent"/>
+                <text x="862" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">10%</tspan> coupon apply</text>
+                <g class="path-tooltip">
+                  <rect x="804" y="101" width="85" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="810" y="109" font-size="7" fill="#F9FAFB">e.g. btn→net</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 7→8 (PV→ERR) · 118 · src=923 tgt=1017 mid=970 · error trigger -->
+          <g class="context-chip">
+            <rect x="920" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="947" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="970" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="920" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 118 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 923 120 C 951 20, 989 20, 1017 120"/>
+                <path d="M 923 120 C 951 50, 989 50, 1017 120"/>
+                <path d="M 923 120 C 951 87, 989 87, 1017 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="970" cy="45" r="7"/>
+                <circle cx="970" cy="68" r="7"/>
+                <circle cx="970" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="977" y="40" width="120" height="12" fill="transparent"/>
+                <text x="982" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">55%</tspan> saved-card timeout</text>
+                <g class="path-tooltip">
+                  <rect x="924" y="51" width="105" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="930" y="59" font-size="7" fill="#F9FAFB">e.g. li→btn→err</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="977" y="63" width="120" height="12" fill="transparent"/>
+                <text x="982" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">30%</tspan> new-card entry</text>
+                <g class="path-tooltip">
+                  <rect x="924" y="74" width="145" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="930" y="82" font-size="7" fill="#F9FAFB">e.g. text→text→text→btn→err</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="977" y="90" width="120" height="12" fill="transparent"/>
+                <text x="982" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> wallet redirect</text>
+                <g class="path-tooltip">
+                  <rect x="924" y="101" width="105" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="930" y="109" font-size="7" fill="#F9FAFB">e.g. btn→net→err</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 8→9 (ERR→CC) · 110 · src=1043 tgt=1137 mid=1090 · recovery -->
+          <g class="context-chip">
+            <rect x="1040" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="1067" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="1090" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="1040" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 110 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 1043 120 C 1071 20, 1109 20, 1137 120"/>
+                <path d="M 1043 120 C 1071 50, 1109 50, 1137 120"/>
+                <path d="M 1043 120 C 1071 87, 1109 87, 1137 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="1090" cy="45" r="7"/>
+                <circle cx="1090" cy="68" r="7"/>
+                <circle cx="1090" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="1097" y="40" width="105" height="12" fill="transparent"/>
+                <text x="1102" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">60%</tspan> retry same card</text>
+                <g class="path-tooltip">
+                  <rect x="1044" y="51" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1050" y="59" font-size="7" fill="#F9FAFB">e.g. btn→li</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="1097" y="63" width="105" height="12" fill="transparent"/>
+                <text x="1102" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">25%</tspan> switch card</text>
+                <g class="path-tooltip">
+                  <rect x="1044" y="74" width="100" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1050" y="82" font-size="7" fill="#F9FAFB">e.g. btn→text→li</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="1097" y="90" width="105" height="12" fill="transparent"/>
+                <text x="1102" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> page refresh</text>
+                <g class="path-tooltip">
+                  <rect x="1044" y="101" width="95" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1050" y="109" font-size="7" fill="#F9FAFB">e.g. pv→text→li</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
+          <!-- Edge 9→10 (CC→PC) · 106 · src=1163 tgt=1257 mid=1210 · overflows into AFTER chip when hovered -->
+          <g class="context-chip">
+            <rect x="1160" y="6" width="100" height="115" fill="transparent"/>
+            <g class="context-chip-body">
+              <rect x="1187" y="100" width="46" height="13" rx="6.5" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="2,2" stroke-width="0.7"/>
+              <text x="1210" y="109" text-anchor="middle" fill="#6B7280" font-size="8.5">▸ 3 paths</text>
+            </g>
+            <g class="context-expansion">
+              <text x="1160" y="15" font-size="9" fill="#9CA3AF" font-style="italic">top 3 · 106 · illustrative</text>
+              <g fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="4,3">
+                <path d="M 1163 120 C 1191 20, 1229 20, 1257 120"/>
+                <path d="M 1163 120 C 1191 50, 1229 50, 1257 120"/>
+                <path d="M 1163 120 C 1191 87, 1229 87, 1257 120"/>
+              </g>
+              <g fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="1210" cy="45" r="7"/>
+                <circle cx="1210" cy="68" r="7"/>
+                <circle cx="1210" cy="95" r="7"/>
+              </g>
+              <g class="path-row">
+                <rect x="1217" y="40" width="100" height="12" fill="transparent"/>
+                <text x="1222" y="48" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">75%</tspan> direct</text>
+                <g class="path-tooltip">
+                  <rect x="1164" y="51" width="65" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1170" y="59" font-size="7" fill="#F9FAFB">e.g. btn</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="1217" y="63" width="100" height="12" fill="transparent"/>
+                <text x="1222" y="71" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">15%</tspan> verify amount</text>
+                <g class="path-tooltip">
+                  <rect x="1164" y="74" width="80" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1170" y="82" font-size="7" fill="#F9FAFB">e.g. text→btn</text>
+                </g>
+              </g>
+              <g class="path-row">
+                <rect x="1217" y="90" width="100" height="12" fill="transparent"/>
+                <text x="1222" y="98" font-size="9" fill="#374151"><tspan font-weight="700" fill="#111827">10%</tspan> coupon retry</text>
+                <g class="path-tooltip">
+                  <rect x="1164" y="101" width="105" height="11" rx="3" fill="#111827" fill-opacity="0.94"/>
+                  <text x="1170" y="109" font-size="7" fill="#F9FAFB">e.g. btn→text→btn</text>
+                </g>
+              </g>
+            </g>
+          </g>
+
           </g>
         </g>
 
@@ -1366,13 +1741,13 @@
         </g>
         <!-- Edges: horizontal = Δt, color matches the lane it sits on (Refund req cyan, Pending purple, others grey); vertical = lane-change connector, uniform light-grey dashed. Loop-backs read as "dashed jump UP into a colored lane". -->
         <!-- 1→2: 5s on Greeting (grey) → drop to Refund req -->
-        <line x1="290" y1="85"  x2="335" y2="85"  stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="290" y1="85"  x2="335" y2="85"  stroke="#D1D5DB" stroke-width="2"/>
         <line x1="335" y1="85"  x2="335" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
         <!-- 2→3: 3s on Refund req (cyan) → drop to Session restart -->
         <line x1="335" y1="120" x2="362" y2="120" stroke="#06B6D4" stroke-width="2"/>
         <line x1="362" y1="120" x2="362" y2="155" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
         <!-- 3→4: 2s on Session restart (grey) → UP to Refund req (loop) -->
-        <line x1="362" y1="155" x2="380" y2="155" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="362" y1="155" x2="380" y2="155" stroke="#D1D5DB" stroke-width="2"/>
         <line x1="380" y1="155" x2="380" y2="120" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
         <!-- 4→5: 5s on Refund req (cyan) → drop to Pending -->
         <line x1="380" y1="120" x2="425" y2="120" stroke="#06B6D4" stroke-width="2"/>
@@ -1384,7 +1759,7 @@
         <line x1="560" y1="120" x2="605" y2="120" stroke="#06B6D4" stroke-width="2"/>
         <line x1="605" y1="120" x2="605" y2="225" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
         <!-- 7→8: 25s on Process init (grey) → UP to Pending (loop) -->
-        <line x1="605" y1="225" x2="830" y2="225" stroke="#9CA3AF" stroke-width="1.8"/>
+        <line x1="605" y1="225" x2="830" y2="225" stroke="#D1D5DB" stroke-width="2"/>
         <line x1="830" y1="225" x2="830" y2="190" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="2,2"/>
         <!-- 8→9: 60s wait on Pending (purple) → drop to Info verify -->
         <line x1="830" y1="190" x2="1370" y2="190" stroke="#A855F7" stroke-width="2"/>
